@@ -1,0 +1,5 @@
+#!/bin/bash
+
+STUFF=${*:-all}
+export CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+CC=${CROSS_COMPILE}gcc CXX=${CROSS_COMPILE}g++ make ARCH=arm ${STUFF}

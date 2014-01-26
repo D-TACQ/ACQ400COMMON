@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DC=$(date +%y%m%d%H%M%S)
+SEQ=03
+PKGID=acq400_common
+
+TOP=.
+
+./make.zynq dump-cstrings
+
+rm -Rf opkg/*
+mkdir -p opkg/usr/local/bin opkg/usr/local/init 
+
+cp ${TOP}/dump-cstrings  ${TOP}/get_u-boot_env opkg/usr/local/bin
+cp ${PKGID}.init opkg/usr/local/init
+
+tar czf release/${SEQ}-${PKGID}-${DC}.tgz -C opkg .
+rm -Rf ../PACKAGES/${SEQ}-${PKGID}*
+cp release/${SEQ}-${PKGID}-${DC}.tgz ../PACKAGES/
+echo cp release/${SEQ}-${PKGID}-${DC}.tgz ../PACKAGES/
+

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+dd if=/dev/mtd0 bs=1024 skip=896 | dump-cstrings | 
+	grep -v \&\& | sed -e 's/=/="/' -e 's/$/"/' >/tmp/u-boot_env
+
+

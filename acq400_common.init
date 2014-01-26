@@ -1,0 +1,2 @@
+#!/bin/sh
+echo acq400_common.init
