@@ -1,0 +1,237 @@
+#!/bin/sh
+
+if [ "$FMC_SCAN_FPGA" = "" ]; then
+	echo ERROR: FMC_SCAN_FPGA not set
+	exit 1
+fi
+if [ "$FMC_SCAN_SITES" = "" ]; then
+	echo ERROR: FMC_SCAN_SITES not set
+	exit 1
+fi
+if [ -d /dev/sites ]; then
+	echo /dev/sites exists, looks like the scan has already completed
+	exit 0
+fi
+mkdir -p /dev/sites
+
+for PRD in /dev/gpio/*present
+do
+	_PRDx=${PRD#/dev/gpio/fmc}
+	site=${_PRDx%_present}
+	if [ $(cat $PRD) -ne 0 ]; then
+		mkdir /dev/sites/$site
+		let BUS=$site+1
+		ln -s /sys/bus/i2c/devices/${BUS}-0050/eeprom /dev/sites/$site
+		echo 1 >/dev/gpio/LED/FMC${site}_R
+	fi
+done
+
+SITES="sites="
+GOOD_SITES="good_sites="
+
+aappend() {
+	case $1 in
+	*=) echo $1$2;;
+	*)  echo $1,$2;;
+	esac
+}
+
+get_fpga_spec() {
+#generated from filename   : ACQ2006_TOP_02_02_ff_ff_ff_40
+# pick out the filename and remove leading _ (then mismatches are by site#)
+	xiloader $* 2>&1 | grep generated | awk '{ print $5 }' | sed -e 's/_//'
+}
+
+let site_count=0
+MTYPES=""
+
+#acq2006_006> cat /dev/sites/5/details 
+#FRU_MAN="D-TACQ Solutions"
+#FRU_PROD_NAME="AO421ELF"
+#FRU_SERIAL="E42100001"
+#FRU_PART_NUM="AO421ELF"
+# and the new ones
+#M=f0
+#N=40
+
+decode_fru_success=0
+
+decode_fru() {
+	
+	site=$1
+	details=$2
+	sdir=/etc/acq400/$site
+	
+	mkdir -p $sdir
+	echo -n "++ decode FRU EEPROM site $site "
+
+	FRU_MAN=xx
+	FRU_PROD_NAME=xx
+	FRU_SERIAL=xx
+	FRU_PART_NUM=xx
+	FRU_MTYPE=xx
+	FRU_NCHAN=xx
+	M=x
+	N=x		
+		
+	nchan=4
+	source $details
+	mn=$(echo $FRU_PART_NUM | cut -d\  -f 2-  )
+	if [ "$mn" != "$FRU_PART_NUM" ]; then
+#		echo FRU_PART_NUM \"$FRU_PART_NUM\" \"$mn\"
+		eval $mn
+	fi
+	
+	if [ "$N" = "x" -o "M" = "x" ]; then
+		decode_fru_success=0
+		echo ERROR: obsolete EEPROM please contact D-TACQ for update
+		return		
+	fi
+	
+	echo $N > $sdir/NCHAN
+	echo $M > $sdir/MTYPE
+	echo $FRU_SERIAL > $sdir/SERIAL
+	echo "$FRU_MAN" > $sdir/MANUFACTURER	
+	echo $FRU_PART_NUM > $sdir/PART_NUM
+	
+	_IFS=$IFS
+	IFS='-'
+	let ii=0
+	for field in $FRU_PART_NUM
+	do
+#		echo decode FRU_PART_NUM: $FRU_PART_NUM: ii $ii field $field
+		case $ii in
+		0) [ -e $sdir/MODEL ] || echo $field > $sdir/MODEL;;
+		1) nchan=$(echo $field | sed -e 's/[^0-9]//g')		
+		   [ -e $sdir/NCHAN ] || echo $nchan  > $sdir/NCHAN;;
+		2) echo $field > $sdir/MAXRATE;;
+		3) echo $field > $sdir/RESOLUTION;;
+		esac
+		let ii=$ii+1
+		if [ $ii -eq 2 -a "$M" != "01" ]; then
+			# next fields valid ACQ420 only
+			break;
+		fi
+	done
+	IFS=$_IFS			
+
+	grep -q FRU_PROD_NAME $details
+	if [ $? -eq 0 ]; then
+		decode_fru_success=1
+		echo OK;
+	else
+		echo FAIL;
+	fi
+
+	chmod 444 ${sdir}/*
+}
+
+good_sites=""
+
+for sd in /dev/sites/*
+do
+	site=$(basename $sd)
+	SITES=$(aappend $SITES $site)
+	fru-dump-acq ${sd}/eeprom > ${sd}/details
+	
+	decode_fru_success=0
+	decode_fru $site ${sd}/details
+	if [ $decode_fru_success -ne 0 ]; then
+		GOOD_SITES=$(aappend $GOOD_SITES $site)
+		good_sites="$good_sites $site"
+	fi
+done
+
+#echo SITES \"$SITES\"
+#echo GOOD_SITES \"$GOOD_SITES\"
+#echo good_sites \"$good_sites\"
+
+
+get_mtype()
+{
+	if [ -e /etc/acq400/$1/MTYPE ]; then
+		cat /etc/acq400/$1/MTYPE
+	else
+		echo ff
+	fi
+}
+
+is_gzip_file() {
+	echo $1 | grep -q \.gz$
+}
+# omit underscore
+ideal_fpga=${FMC_SCAN_FPGA}TOP
+
+for site in $FMC_SCAN_SITES
+do
+	ideal_fpga="${ideal_fpga}_$(get_mtype $site)"
+done
+
+
+
+
+fpga_image_good=""
+
+test_compatible_bitfile() {
+	if [ -r $1 ]; then
+		echo +++ testing bitfile $1 $(is_gzip_file $1)		
+		is_gzip_file $1
+		if [ $? -eq 0 ]; then
+			fspec=$(gunzip -c $1 | get_fpga_spec -i -)
+		else
+			fspec=$(get_fpga_spec $1)
+		fi
+		is_compatible_bitfile $ideal_fpga $fspec
+		if [ $? -eq 0 ]; then
+			fpga_image_good=$1
+		fi
+	fi		
+}
+
+for file in /mnt/FPGA.bit /mnt/fpga.d/*.bit*
+do
+	test_compatible_bitfile $file
+	if [ "$fpga_image_good" != "" ]; then
+		echo load FPGA $fpga_image_good
+		echo load.fpga loaded $fpga_image_good >/tmp/fpga_status
+		is_gzip_file $fpga_image_good
+		if [ $? -eq 0 ]; then
+			gunzip -c $fpga_image_good | \
+				/bin/xiloader -L 2>>/tmp/fpga_status
+		else
+			/bin/xiloader -L $fpga_image_good 2>>/tmp/fpga_status
+		fi
+		if [ $? -ne 0 ]; then
+			echo "ERROR FPGA load failed launch emergency shell"
+			/bin/sh
+		fi	
+		break
+	fi
+done	
+
+if [ "$fpga_image_good" = "" ]; then
+	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
+	exit	
+fi 
+
+for site in $good_sites
+do	
+	set.sys /dev/gpio/LED/FMC${site}_R 0
+	set.sys /dev/gpio/LED/FMC${site}_G 1
+	let site_count=$site_count+1
+done
+
+echo $SITES > /etc/sites
+echo $GOOD_SITES >>/etc/sites
+
+source /etc/sites
+
+if [ "x$sites" = "x$good_sites" ]; then
+	echo ++ Sites populated: $site_count ALL GOOD
+	echo ++ Enable analog power..
+	echo 1 >/dev/gpio/15VA_EN
+else
+	echo ++ Sites populated: $site_count WARNING: FOUND:$sites GOOD:$good_sites
+fi
+
+

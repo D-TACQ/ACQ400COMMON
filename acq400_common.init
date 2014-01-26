@@ -1,2 +1,4 @@
 #!/bin/sh
 echo acq400_common.init
+get_u-boot_env
+

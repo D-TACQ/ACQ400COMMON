@@ -1,0 +1,52 @@
+#!/bin/sh
+# set the front panel MUX state
+
+base=${0##*/}
+
+setget=${base%%.*}
+
+KNOBS="FP_CLK_OE FP_OE OSC_X_CLK_OE OSC_X_OE"
+FPCLK="1 1 0 0"
+XCLK="0 0 1 1"
+OFF="0 0 0 0"
+
+PF=/dev/shm/platform/clk
+mkdir -p $PF
+
+doit() {
+	for K in $KNOBS
+	do
+		echo set.sys /dev/gpio/CLK/$K $1
+		set.sys /dev/gpio/CLK/$K $1
+
+		shift
+	done
+}
+
+squish() {
+	echo $1 | tr -d \  
+}
+
+getvalue() {
+	BITS=$(cat /dev/gpio/CLK/*OE)
+	BITS=$(squish $BITS)
+	case $BITS in
+	$(squish $XCLK)) 	echo 1 > $PF/FPMUX; echo xclk;;
+	$(squish $FPCLK)) 	echo 2 > $PF/FPMUX; echo fpclk;;
+	$(squish $OFF)) 	echo 0 > $PF/FPMUX; echo off;;
+	*)	 		echo ERROR;;
+	esac
+}
+
+
+if [ "$setget" = "get" -o "$1" = "" ]; then
+	getvalue
+else
+	case $1 in
+	fpclk)	echo 2 > $PF/FPMUX; doit $FPCLK;;
+	xclk) 	echo 1 > $PF/FPMUX; doit $XCLK;;
+	off)	echo 0 > $PF/FPMUX; doit $OFF;;
+	*)	echo ERROR bad argument \"$1\";;
+	esac
+fi
+

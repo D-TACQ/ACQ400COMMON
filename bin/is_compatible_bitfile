@@ -1,0 +1,36 @@
+#!/usr/local/bin/expect
+# is_compatible_bitfile myspec filespec
+# myspec is a carrier+module definition eg ACQ2006_TOP_02_ff_ff_ff_ff_80
+# filespec is a bit file     definition eg ACQ2006_TOP_02_02_ff_ff_ff_80
+# they're compatible IF each field in myspec matches filespec OR is ff
+
+if {$argc != 2} {
+	puts "usage is is_compatible_bitfile myspec filespec"
+	exit 1	
+}
+set myspec [lindex $argv 0]
+set filespec [lindex $argv 1]
+
+puts "myspec $myspec filespec $filespec"
+
+set myspec [split $myspec _]
+set filespec [split $filespec _]
+
+set ii 0
+foreach myfield $myspec {
+	set ffield [lindex $filespec $ii]
+	
+	if {$myfield == "ff"} {
+		;
+	} elseif {$myfield == $ffield} {
+		;
+	} else {
+		puts "WARNING: not a compatible bitfile, mismatch at $ii"
+		exit 1
+	} 
+	incr ii
+}
+
+exit 0
+
+
