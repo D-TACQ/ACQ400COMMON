@@ -12,6 +12,8 @@ rm -Rf opkg/*
 mkdir -p opkg/usr/local/bin opkg/usr/local/init 
 
 cp ${TOP}/dump-cstrings  ${TOP}/get_u-boot_env opkg/usr/local/bin
+cp ${TOP}/bin/* opkg/usr/local/bin
+cp -a ${TOP}/UTILS/ob_calc_527 opkg/usr/local/bin
 cp ${PKGID}.init opkg/usr/local/init
 
 tar czf release/${SEQ}-${PKGID}-${DC}.tgz -C opkg .
