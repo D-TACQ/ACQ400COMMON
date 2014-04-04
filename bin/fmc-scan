@@ -188,7 +188,7 @@ test_compatible_bitfile() {
 	fi		
 }
 
-for file in /mnt/FPGA.bit /mnt/fpga.d/*.bit*
+for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
 do
 	test_compatible_bitfile $file
 	if [ "$fpga_image_good" != "" ]; then
