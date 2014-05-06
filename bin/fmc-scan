@@ -228,7 +228,7 @@ do
 done
 
 if [ "$fpga_image_good" = "" ]; then
-	for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
+	for file in /mnt/*.bit* $(ls /mnt/fpga.d/*.bit* | sort -r)
 	do
 		test_compatible_bitfile $(get_fspec $file)
 		if [ "$fpga_image_good" != "" ]; then
