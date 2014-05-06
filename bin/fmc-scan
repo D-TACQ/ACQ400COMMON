@@ -172,42 +172,71 @@ done
 
 fpga_image_good=""
 
-test_compatible_bitfile() {
+get_fspec() {
 	if [ -r $1 ]; then
-		echo +++ testing bitfile $1 $(is_gzip_file $1)		
 		is_gzip_file $1
 		if [ $? -eq 0 ]; then
 			fspec=$(gunzip -c $1 | get_fpga_spec -i -)
 		else
 			fspec=$(get_fpga_spec $1)
 		fi
+		echo $fspec
+	fi
+}
+test_compatible_bitfile() {
+	fspec=$1
+	if [ "x$fspec" != "x" ]; then
 		is_compatible_bitfile $ideal_fpga $fspec
 		if [ $? -eq 0 ]; then
+			echo +++ compatible bitfile $fspec
 			fpga_image_good=$1
 		fi
 	fi		
 }
 
+test_identical_bitfile() {
+	if [ "x$ideal_fpga" = "x$1" ]; then
+		echo +++ identical bitfile
+		fpga_image_good=$1
+	fi
+}
+
+load_fpga() {
+	fpga_image_good=$1
+	echo load FPGA $fpga_image_good
+	echo load.fpga loaded $fpga_image_good >/tmp/fpga_status
+	is_gzip_file $fpga_image_good
+	if [ $? -eq 0 ]; then
+		gunzip -c $fpga_image_good | \
+			/bin/xiloader -L 2>>/tmp/fpga_status
+	else
+		/bin/xiloader -L $fpga_image_good 2>>/tmp/fpga_status
+	fi
+	if [ $? -ne 0 ]; then
+		echo "ERROR FPGA load failed launch emergency shell"
+		/bin/sh
+	fi	
+}
+
 for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
 do
-	test_compatible_bitfile $file
+	test_identical_bitfile $(get_fspec $file)
 	if [ "$fpga_image_good" != "" ]; then
-		echo load FPGA $fpga_image_good
-		echo load.fpga loaded $fpga_image_good >/tmp/fpga_status
-		is_gzip_file $fpga_image_good
-		if [ $? -eq 0 ]; then
-			gunzip -c $fpga_image_good | \
-				/bin/xiloader -L 2>>/tmp/fpga_status
-		else
-			/bin/xiloader -L $fpga_image_good 2>>/tmp/fpga_status
-		fi
-		if [ $? -ne 0 ]; then
-			echo "ERROR FPGA load failed launch emergency shell"
-			/bin/sh
-		fi	
+		load_fpga $file
 		break
 	fi
-done	
+done
+
+if [ "$fpga_image_good" = "" ]; then
+	for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
+	do
+		test_compatible_bitfile $(get_fspec $file)
+		if [ "$fpga_image_good" != "" ]; then
+			load_fpga $file
+			break
+		fi
+	done
+fi
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
