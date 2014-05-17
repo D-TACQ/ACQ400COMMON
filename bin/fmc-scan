@@ -128,17 +128,19 @@ decode_fru() {
 
 good_sites=""
 
-for sd in /dev/sites/*
+for sd in /dev/sites/?
 do
-	site=$(basename $sd)
-	SITES=$(aappend $SITES $site)
-	fru-dump-acq ${sd}/eeprom > ${sd}/details
+	if [ -d $sd ]; then
+		site=$(basename $sd)
+		SITES=$(aappend $SITES $site)
+		fru-dump-acq ${sd}/eeprom > ${sd}/details
 	
-	decode_fru_success=0
-	decode_fru $site ${sd}/details
-	if [ $decode_fru_success -ne 0 ]; then
-		GOOD_SITES=$(aappend $GOOD_SITES $site)
-		good_sites="$good_sites $site"
+		decode_fru_success=0
+		decode_fru $site ${sd}/details
+		if [ $decode_fru_success -ne 0 ]; then
+			GOOD_SITES=$(aappend $GOOD_SITES $site)
+			good_sites="$good_sites $site"
+		fi
 	fi
 done
 
