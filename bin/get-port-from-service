@@ -1,0 +1,8 @@
+#!/bin/sh
+svc=$1
+if [ "x$svc" = "x" ]; then
+	echo "USAGE get-port-from-service SERVICE"
+	exit 1
+fi
+grep $svc /etc/services | awk '{print $2}' | awk -F/ '{print $1}'
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+let port=$(get-port-from-service $(basename $0))
+if [ $port -gt 0 ]; then
+	nc localhost $port
+fi
+
+

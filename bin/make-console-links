@@ -1,0 +1,9 @@
+#!/bin/sh
+cd /usr/local/bin
+for svc in $(grep acq4xx.*console /etc/services|awk '{print $1}')
+do
+	if [ ! -e $svc ]; then
+		ln -s acq4xx-console $svc
+	fi
+done
+
