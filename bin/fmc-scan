@@ -1,4 +1,5 @@
 #!/bin/sh
+# ACQ2006B_TOP_01_01_ff_ff_ff_ff
 
 if [ "$FMC_SCAN_FPGA" = "" ]; then
 	echo ERROR: FMC_SCAN_FPGA not set
