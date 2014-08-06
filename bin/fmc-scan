@@ -15,6 +15,8 @@ if [ -d /dev/sites ]; then
 fi
 mkdir -p /dev/sites
 
+let module_count=0
+
 for PRD in /dev/gpio/*present
 do
 	_PRDx=${PRD#/dev/gpio/fmc}
@@ -24,6 +26,7 @@ do
 		let BUS=$site+1
 		ln -s /sys/bus/i2c/devices/${BUS}-0050/eeprom /dev/sites/$site
 		echo 1 >/dev/gpio/LED/FMC${site}_R
+		let module_count=$module_count+1
 	fi
 done
 
@@ -230,7 +233,7 @@ do
 	fi
 done
 
-if [ "$fpga_image_good" = "" ]; then
+if [ "$fpga_image_good" = "" -a $module_count != 0 ]; then
 	for file in /mnt/*.bit* $(ls /mnt/fpga.d/*.bit* | sort -r)
 	do
 		test_compatible_bitfile $(get_fspec $file)
