@@ -199,7 +199,7 @@ EOF
 		esac					
 	done
 	
-	zmon=/sys/bus/platform/devices/f8007100.ps7-xadc/iio:device
+	zmon=/sys/bus/platform/devices/f8007100.ps7-xadc/iio:device0
 	if [ -e $zmon ]; then
 				ln -s $zmon /dev/hwmon/Z
 	fi
