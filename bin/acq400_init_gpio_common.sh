@@ -1,5 +1,5 @@
 
-# acq2006_init_gpio_common : function lib for acq2006[b]_init_gpio
+# acq400_init_gpio_common : function lib for acqXXXX_init_gpio
 
 export_gpio() {
 	echo $1 > export
@@ -54,7 +54,7 @@ i2c_reset() {
 }
 
 common_begin() {
-	echo ++ acq2006_init_gpio_common begin
+	echo ++ acq400_init_gpio_common begin
 
 	mkdir -p /dev/gpio
 	cd /sys/class/gpio
@@ -96,7 +96,7 @@ gpioLED() {
 	echo gpio$lgp
 }
 common_end() {
-	echo ++ acq2006_init_gpio_common end
+	echo ++ acq400_init_gpio_common end 01
 	
 # LP3943ISQ
 	
@@ -156,17 +156,18 @@ EOF
 	mkln $(gpioLED $LED0 14) LED/ACT_R  	AL
 		
 	clear_leds
-	echo "++ lamp test"
+	echo "++ lamp test 01"
 	test_leds
-	
+	echo "++ lamp test 99"
 	
 # OK, this isn't gpio, but it's handy to put it here:
 	
 	mkdir -p /dev/hwmon
 	
-	for S in 0 1 2 3 4 5 6 7
+	for hwmon in /sys/class/hwmon/hwmon*
 	do
-		SRC=/sys/class/hwmon/hwmon${S}/device
+		S=${hwmon##*n}	
+		SRC=$hwmon/device
 		if [ -e ${SRC}/temp ]; then
 			ID=Z
 		elif [ -e ${SRC}/temp1_input ]; then
@@ -197,4 +198,10 @@ EOF
 			done;;
 		esac					
 	done
+	
+	zmon=/sys/bus/platform/devices/f8007100.ps7-xadc/iio:device
+	if [ -e $zmon ]; then
+				ln -s $zmon /dev/hwmon/Z
+	fi
+	echo ++ acq400_init_gpio_common end 99
 }
