@@ -142,10 +142,10 @@ common_end() {
 	if [ -e /sys/class/pwm/pwmchip0/pwm0 ]; then
 # inversed control dropped from released driver
 #set.sys /sys/class/pwm/pwmchip0/pwm0/polarity inversed
-			set.sys /sys/class/pwm/pwmchip0/pwm0/period 100000
+		set.sys /sys/class/pwm/pwmchip0/pwm0/period 100000
 		set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle 50000
 		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
-		create_set_fanspeed()
+		create_set_fanspeed
 	fi
 	
 	mkln $(gpioLED $LED0 1)  LED/FMC1_G 	AL
