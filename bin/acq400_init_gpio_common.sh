@@ -95,6 +95,27 @@ gpioLED() {
 	let lgp=$1+$2
 	echo gpio$lgp
 }
+
+create_set_fanspeed() {
+		# acq2006 only		 
+	cat - >/usr/local/bin/set.fanspeed <<EOF
+#!/bin/sh
+# set fanspeed acq2006 style
+FSPERCENT=\${1:-50}
+if [ \$FSPERCENT -gt 100 ]; then 
+	let FSPERCENT=100
+elif [ \$FSPERCENT -lt 0 ]; then
+	let FSPERCENT=0
+fi
+# inverse ratio
+let DC="(100-\$FSPERCENT)*1000"
+set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle \$DC
+EOF
+		
+	chmod a+rx /usr/local/bin/set.fanspeed
+	echo /usr/local/bin/set.fanspeed created
+}
+
 common_end() {
 	echo ++ acq400_init_gpio_common end 01
 	
@@ -118,27 +139,14 @@ common_end() {
 		setO gpio${pin}
 	done
 	
+	if [ -e /sys/class/pwm/pwmchip0/pwm0 ]; then
 # inversed control dropped from released driver
 #set.sys /sys/class/pwm/pwmchip0/pwm0/polarity inversed
-	set.sys /sys/class/pwm/pwmchip0/pwm0/period 100000
-	set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle 50000
-	set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
-	
-cat - >/usr/local/bin/set.fanspeed <<EOF
-#!/bin/sh
-# set fanspeed acq2006 style
-FSPERCENT=\${1:-50}
-if [ \$FSPERCENT -gt 100 ]; then 
-	let FSPERCENT=100
-elif [ \$FSPERCENT -lt 0 ]; then
-	let FSPERCENT=0
-fi
-# inverse ratio
-let DC="(100-\$FSPERCENT)*1000"
-set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle \$DC
-EOF
-	chmod a+rx /usr/local/bin/set.fanspeed
-	echo /usr/local/bin/set.fanspeed created
+			set.sys /sys/class/pwm/pwmchip0/pwm0/period 100000
+		set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle 50000
+		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
+		create_set_fanspeed()
+	fi
 	
 	mkln $(gpioLED $LED0 1)  LED/FMC1_G 	AL
 	mkln $(gpioLED $LED0 2)  LED/FMC2_G 	AL
