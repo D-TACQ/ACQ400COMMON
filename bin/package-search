@@ -1,0 +1,15 @@
+#!/bin/sh
+
+PAT=${1:-.}
+
+for pk in /mnt/packages/*
+do
+	result="$(tar tvzf $pk | grep $PAT)"
+	if [ $? -eq 0 ]; then
+		echo $result $pk | awk '{print $6" "$7}'
+		exit 0
+	fi
+done
+
+exit 1
+
