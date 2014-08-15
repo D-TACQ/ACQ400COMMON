@@ -8,6 +8,8 @@ export_gpio() {
 getchip() {
 	addr=$1
 	ls -l gpiochip* | grep $addr | awk '{ print $9 }'
+	# force exit code ..
+	ls -l gpiochip* | grep -q $addr
 }
 
 setHI() {
