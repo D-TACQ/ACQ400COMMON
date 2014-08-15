@@ -118,29 +118,43 @@ EOF
 	echo /usr/local/bin/set.fanspeed created
 }
 
-common_end() {
-	echo ++ acq400_init_gpio_common end 01
-	
+init_acq2006_leds() {
 # LP3943ISQ
 	
 	LEDSCHIP=$(getchip 1-0060)
-	if [ $? -ne 0 ]; then
-		echo +++ ERROR: LEDSCHIP NOT FOUND
-	else
+	if [ $? -eq 0 ]; then
 		echo +++ LEDSCHIP FOUND $LEDSCHIP
-	fi
-	let LED0=${LEDSCHIP#gpiochip*}
+
+		let LED0=${LEDSCHIP#gpiochip*}
 # LED0 : PWM NOT GPIO 
-	let LED01=$LED0+1
-	let LED1=$LED0+14
+		let LED01=$LED0+1
+		let LED1=$LED0+14
 
 	
-	for pin in $(seq $LED01 $LED1)
-	do
-		export_gpio $pin
-		setO gpio${pin}
-	done
-	
+		for pin in $(seq $LED01 $LED1)
+		do
+					export_gpio $pin
+			setO gpio${pin}
+		done
+
+		mkln $(gpioLED $LED0 1)  LED/FMC1_G 	AL
+		mkln $(gpioLED $LED0 2)  LED/FMC2_G 	AL
+		mkln $(gpioLED $LED0 3)  LED/FMC3_G	AL
+		mkln $(gpioLED $LED0 4)  LED/FMC4_G 	AL
+		mkln $(gpioLED $LED0 5)  LED/FMC5_G 	AL
+		mkln $(gpioLED $LED0 6)  LED/FMC6_G 	AL
+		mkln $(gpioLED $LED0 7)  LED/FMC1_R 	AL
+		mkln $(gpioLED $LED0 8)  LED/FMC2_R 	AL
+		mkln $(gpioLED $LED0 9)  LED/FMC3_R 	AL
+		mkln $(gpioLED $LED0 10) LED/FMC4_R 	AL
+		mkln $(gpioLED $LED0 11) LED/FMC5_R 	AL
+		mkln $(gpioLED $LED0 12) LED/FMC6_R 	AL
+		mkln $(gpioLED $LED0 13) LED/ACT_G  	AL
+		mkln $(gpioLED $LED0 14) LED/ACT_R  	AL
+	fi					
+}
+
+acq2006_create_pwm() {
 	if [ -e /sys/class/pwm/pwmchip0/pwm0 ]; then
 # inversed control dropped from released driver
 #set.sys /sys/class/pwm/pwmchip0/pwm0/polarity inversed
@@ -149,27 +163,20 @@ common_end() {
 		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
 		create_set_fanspeed
 	fi
+}
+
+common_end() {
+	echo ++ acq400_init_gpio_common end 01
 	
-	mkln $(gpioLED $LED0 1)  LED/FMC1_G 	AL
-	mkln $(gpioLED $LED0 2)  LED/FMC2_G 	AL
-	mkln $(gpioLED $LED0 3)  LED/FMC3_G	AL
-	mkln $(gpioLED $LED0 4)  LED/FMC4_G 	AL
-	mkln $(gpioLED $LED0 5)  LED/FMC5_G 	AL
-	mkln $(gpioLED $LED0 6)  LED/FMC6_G 	AL
-	mkln $(gpioLED $LED0 7)  LED/FMC1_R 	AL
-	mkln $(gpioLED $LED0 8)  LED/FMC2_R 	AL
-	mkln $(gpioLED $LED0 9)  LED/FMC3_R 	AL
-	mkln $(gpioLED $LED0 10) LED/FMC4_R 	AL
-	mkln $(gpioLED $LED0 11) LED/FMC5_R 	AL
-	mkln $(gpioLED $LED0 12) LED/FMC6_R 	AL
-	mkln $(gpioLED $LED0 13) LED/ACT_G  	AL
-	mkln $(gpioLED $LED0 14) LED/ACT_R  	AL
+	init_acq2006_leds
 		
 	clear_leds
 	echo "++ lamp test 01"
 	test_leds
 	echo "++ lamp test 99"
-	
+
+	acq2006_create_pwm
+		
 # OK, this isn't gpio, but it's handy to put it here:
 	
 	mkdir -p /dev/hwmon
