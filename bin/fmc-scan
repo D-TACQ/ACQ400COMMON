@@ -228,7 +228,7 @@ load_fpga() {
 }
 
 if [ ! -z $PREFERRED_BITFILE -a -e $PREFERRED_BITFILE ]; then
-	 test_compatible_bitfile $(get_fpsec $PREFERRED_BITFILE)
+	 test_compatible_bitfile $(get_fspec $PREFERRED_BITFILE)
 	if [ "x$fpga_image_good" != "x" ]; then
 		load_fpga $PREFERRED_BITFILE
 	fi
