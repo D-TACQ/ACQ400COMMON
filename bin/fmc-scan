@@ -1,6 +1,9 @@
 #!/bin/sh
 # ACQ2006B_TOP_01_01_ff_ff_ff_ff
 
+if [ -e /mnt/fmc-scan.conf ]; 
+	source /mnt/local/fmc-scan.conf
+fi
 if [ "$FMC_SCAN_FPGA" = "" ]; then
 	echo ERROR: FMC_SCAN_FPGA not set
 	exit 1
@@ -224,20 +227,29 @@ load_fpga() {
 	fi	
 }
 
-for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
-do
-	test_identical_bitfile $(get_fspec $file)
-	if [ "$fpga_image_good" != "" ]; then
-		load_fpga $file
-		break
+if [ ! -z $PREFERRED_BITFILE -a -e $PREFERRED_BITFILE ]; then
+	 test_compatible_bitfile $(get_fpsec $PREFERRED_BITFILE)
+	if [ "x$fpga_image_good" != "x" ]; then
+		load_fpga $PREFERRED_BITFILE
 	fi
-done
+fi
 
-if [ "$fpga_image_good" = "" -a $module_count != 0 ]; then
+if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
+	for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
+	do
+		test_identical_bitfile $(get_fspec $file)
+		if [ "x$fpga_image_good" != "x" ]; then
+			load_fpga $file
+			break
+		fi
+	done
+fi
+
+if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
 	for file in /mnt/*.bit* $(ls /mnt/fpga.d/*.bit* | sort -r)
 	do
 		test_compatible_bitfile $(get_fspec $file)
-		if [ "$fpga_image_good" != "" ]; then
+		if [ "x$fpga_image_good" != "x" ]; then
 			load_fpga $file
 			break
 		fi
