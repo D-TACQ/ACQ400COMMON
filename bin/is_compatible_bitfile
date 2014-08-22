@@ -22,6 +22,9 @@ foreach myfield $myspec {
 	
 	if {$myfield == "ff"} {
 		;
+	} elseif {$myfield == 62} {
+# 			ignore DIO432_PMOD	
+		;			
 	} elseif {$myfield == $ffield} {
 		;
 	} else {
