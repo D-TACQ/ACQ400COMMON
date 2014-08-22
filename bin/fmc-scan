@@ -1,7 +1,7 @@
 #!/bin/sh
 # ACQ2006B_TOP_01_01_ff_ff_ff_ff
 
-if [ -e /mnt/fmc-scan.conf ]; 
+if [ -e /mnt/fmc-scan.conf ]; then
 	source /mnt/local/fmc-scan.conf
 fi
 if [ "$FMC_SCAN_FPGA" = "" ]; then
