@@ -21,12 +21,15 @@ foreach myfield $myspec {
 	set ffield [lindex $filespec $ii]
 	
 	if {$myfield == "ff"} {
-		;
-	} elseif {$myfield == 62} {
-# 			ignore DIO432_PMOD	
 		;			
 	} elseif {$myfield == $ffield} {
 		;
+	} elseif {$myfield == "62"} {
+# 			ignore DIO432_PMOD	
+		;
+	} elseif {$myfield == "A5" && $ffield == "05"} {
+#			acq425-2000 is compatible with acq425-1000 .. not other way round
+		;		
 	} else {
 		puts "WARNING: not a compatible bitfile, mismatch at $ii"
 		exit 1
