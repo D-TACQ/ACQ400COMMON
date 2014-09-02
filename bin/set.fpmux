@@ -4,11 +4,11 @@
 base=${0##*/}
 
 setget=${base%%.*}
-
-KNOBS="FP_CLK_OE FP_OE OSC_X_CLK_OE OSC_X_OE"
-FPCLK="1 1 0 0"
-XCLK="0 0 1 1"
-OFF="0 0 0 0"
+KNOBS="FP_CLK_OE FP_OE OSC_X_CLK_OE OSC_X_OE ZCLK_OE"
+FPCLK="1 1 0 0 0"
+ XCLK="0 0 1 1 0"
+ ZCLK="0 0 0 0 1"
+  OFF="0 0 0 0 0"
 
 PF=/dev/shm/platform/clk
 mkdir -p $PF
@@ -28,11 +28,12 @@ squish() {
 }
 
 getvalue() {
-	BITS=$(cat /dev/gpio/CLK/*OE)
+	BITS=$(cd /dev/gpio/CLK/; cat $KNOBS)
 	BITS=$(squish $BITS)
 	case $BITS in
 	$(squish $XCLK)) 	echo 1 > $PF/FPMUX; echo xclk;;
 	$(squish $FPCLK)) 	echo 2 > $PF/FPMUX; echo fpclk;;
+	$(squish $ZCLK))	echo 3 > $PF/FPMUX; echo fpclk;;
 	$(squish $OFF)) 	echo 0 > $PF/FPMUX; echo off;;
 	*)	 		echo ERROR;;
 	esac
@@ -43,6 +44,7 @@ if [ "$setget" = "get" -o "$1" = "" ]; then
 	getvalue
 else
 	case $1 in
+	zclk)	echo 3 > $PF/FPMUX; doit $ZCLK;;
 	fpclk)	echo 2 > $PF/FPMUX; doit $FPCLK;;
 	xclk) 	echo 1 > $PF/FPMUX; doit $XCLK;;
 	off)	echo 0 > $PF/FPMUX; doit $OFF;;
