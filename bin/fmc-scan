@@ -2,6 +2,7 @@
 # ACQ2006B_TOP_01_01_ff_ff_ff_ff
 
 if [ -e /mnt/local/fmc-scan.conf ]; then
+	echo +++ fmc-scan using /mnt/local/fmc-scan.conf
 	source /mnt/local/fmc-scan.conf
 fi
 if [ "$FMC_SCAN_FPGA" = "" ]; then
@@ -12,8 +13,9 @@ if [ "$FMC_SCAN_SITES" = "" ]; then
 	echo ERROR: FMC_SCAN_SITES not set
 	exit 1
 fi
-if [ -d /dev/sites ]; then
-	echo /dev/sites exists, looks like the scan has already completed
+scan_done=/var/run/fmc-scan-done
+if [ -e $scan_done ]; then
+	echo  $scan_done exists, looks like the scan has already completed
 	exit 0
 fi
 mkdir -p /dev/sites
@@ -23,13 +25,23 @@ let module_count=0
 for PRD in /dev/gpio/*present
 do
 	_PRDx=${PRD#/dev/gpio/fmc}
+	if [ "$_PRDx" = "$PRD" ]; then
+		_PRDx=${PRD#/dev/gpio/pmod}				
+	fi
+	if [ "$_PRDx" = "$PRD" ]; then
+		echo ERROR $PRD not supported
+		exit 1
+	fi
 	site=${_PRDx%_present}
 	if [ $(cat $PRD) -ne 0 ]; then
-		mkdir /dev/sites/$site
-		let BUS=$site+1
-		ln -s /sys/bus/i2c/devices/${BUS}-0050/eeprom /dev/sites/$site
-		echo 1 >/dev/gpio/LED/FMC${site}_R
-		let module_count=$module_count+1
+		# PMODS are faked .. don't try make them again0
+		if [ ! -e /dev/sites/$site ]; then  
+			mkdir /dev/sites/$site
+			let BUS=$site+1
+			ln -s /sys/bus/i2c/devices/${BUS}-0050/eeprom /dev/sites/$site
+			echo 1 >/dev/gpio/LED/FMC${site}_R
+		fi
+		let module_count=$module_count+1	
 	fi
 done
 
@@ -283,4 +295,5 @@ else
 	echo ++ Sites populated: $site_count WARNING: FOUND:$sites GOOD:$good_sites
 fi
 
+echo done > $scan_done
 
