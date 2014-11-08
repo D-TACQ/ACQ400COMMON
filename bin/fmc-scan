@@ -289,8 +289,6 @@ source /etc/sites
 
 if [ "x$sites" = "x$good_sites" ]; then
 	echo ++ Sites populated: $site_count ALL GOOD
-	echo ++ Enable analog power..
-	echo 1 >/dev/gpio/15VA_EN
 else
 	echo ++ Sites populated: $site_count WARNING: FOUND:$sites GOOD:$good_sites
 fi
