@@ -80,7 +80,9 @@ set ODW $expect_out(6,string)
 
 set ROOT	"/dev/gpio/CLK/MB"
 
-puts "SP: $SP ACT:$ACT FDW:$FDW RDW:$RDW ODW:$ODW"
+puts "FIN:$FIN FOUT:$FOUT SP:$SP ACT:$ACT FDW:$FDW RDW:$RDW ODW:$ODW"
+report "FIN:$FIN FOUT:$FOUT SP:$SP ACT:$ACT FDW:$FDW RDW:$RDW ODW:$ODW"
+
 
 proc putBits {root pfx dval} {
 	binary scan [binary format c $dval] b* bits
