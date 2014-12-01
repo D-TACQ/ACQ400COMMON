@@ -91,7 +91,7 @@ proc putBits {root pfx dval} {
 	set bn 0
 	foreach K $knobs {
 		set xx [string index $bits $bn]
-#		puts "set.sys $K $xx"
+#		puts "bits:$bits bn: $bn set.sys $K $xx"
 		set F [open $K w]
 		puts $F $xx
 		incr bn
