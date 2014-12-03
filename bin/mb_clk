@@ -3,6 +3,9 @@
 
 set MN "(\[0-9\]*)"
 
+close stdout
+open /var/log/mb_clock.log w
+
 proc report {message} {
 	set LOG	[open /dev/shm/mb_clock w]
 	puts $LOG $message
