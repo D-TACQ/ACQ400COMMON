@@ -24,17 +24,17 @@ doit() {
 }
 
 squish() {
-	echo $1 | tr -d \  
+	echo $* | sed -e 's/ //g'  
 }
 
 getvalue() {
 	BITS=$(cd /dev/gpio/CLK/; cat $KNOBS)
 	BITS=$(squish $BITS)
 	case $BITS in
-	$(squish $XCLK)) 	echo 1 > $PF/FPMUX; echo xclk;;
-	$(squish $FPCLK)) 	echo 2 > $PF/FPMUX; echo fpclk;;
-	$(squish $ZCLK))	echo 3 > $PF/FPMUX; echo fpclk;;
-	$(squish $OFF)) 	echo 0 > $PF/FPMUX; echo off;;
+	$(squish $XCLK)) 	echo xclk;;
+	$(squish $FPCLK)) 	echo fpclk;;
+	$(squish $ZCLK))	echo zclk;;
+	$(squish $OFF)) 	echo off;;
 	*)	 		echo ERROR;;
 	esac
 }
