@@ -39,7 +39,13 @@ create_set_fanspeed() {
 	cat - >/usr/local/bin/set.fanspeed <<EOF
 #!/bin/sh
 # set fanspeed acq2006 style
-FSPERCENT=\${1:-50}
+if [ "x\$2" != "x" ]; then
+	FAN=\$1
+	FSPERCENT=\$2
+else
+	FAN=0
+	FSPERCENT=\${1:-50}
+fi
 if [ \$FSPERCENT -gt 100 ]; then 
 	let FSPERCENT=100
 elif [ \$FSPERCENT -lt 0 ]; then
@@ -47,11 +53,11 @@ elif [ \$FSPERCENT -lt 0 ]; then
 fi
 # inverse ratio
 let DC="(100-\$FSPERCENT)*1000"
-set.sys /sys/class/pwm/pwmchip0/pwm$1/duty_cycle \$DC
+set.sys /sys/class/pwm/pwmchip0/pwm\${FAN}/duty_cycle \$DC
 EOF
 		
-	chmod a+rx /usr/local/bin/set.fanspeed$1
-	echo /usr/local/bin/set.fanspeed$1 created
+	chmod a+rx /usr/local/bin/set.fanspeed
+	echo /usr/local/bin/set.fanspeed created
 }
 
 
@@ -63,15 +69,14 @@ acq2006_create_pwm() {
 		set.sys /sys/class/pwm/pwmchip0/pwm0/period 100000
 		set.sys /sys/class/pwm/pwmchip0/pwm0/duty_cycle 50000
 		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
-		create_set_fanspeed 0
+		create_set_fanspeed
 	fi
 	if [ -e /sys/class/pwm/pwmchip0/pwm1 ]; then
 # inversed control dropped from released driver
 #set.sys /sys/class/pwm/pwmchip0/pwm0/polarity inversed
 		set.sys /sys/class/pwm/pwmchip0/pwm1/period 100000
 		set.sys /sys/class/pwm/pwmchip0/pwm1/duty_cycle 50000
-		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1
-		create_set_fanspeed 1
+		set.sys /sys/class/pwm/pwmchip0/pwm0/enable 1		
 	fi	
 }
 
