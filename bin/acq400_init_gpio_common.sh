@@ -80,7 +80,7 @@ common_begin() {
 clear_leds() {	
 	for LED in /dev/gpio/LED/*
 	do
-		echo 0 > $LED
+		setLO $LED
 	done
 }
 	
@@ -106,6 +106,8 @@ common_end() {
 	echo "++ lamp test 01"
 	test_leds
 	echo "++ lamp test 99"	
+	clear_leds
+	echo "++ leds all clear now "
 		
 # OK, this isn't gpio, but it's handy to put it here:
 	
