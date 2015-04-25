@@ -25,5 +25,6 @@ fpga_check() {
 }
 
 
-echo $(patch_check) > /etc/software_version
-echo $(fpga_check) > /etc/fpga_version
+mkdir -p /etc/acq400/0
+echo $(patch_check) > /etc/acq400/0/software_version
+echo $(fpga_check) > /etc/acq400/0/fpga_version
