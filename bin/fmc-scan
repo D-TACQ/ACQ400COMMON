@@ -222,17 +222,26 @@ test_identical_bitfile() {
 	fi
 }
 
+FPGA_STATUS=/tmp/fpga_status
+
+fpga_check() {
+        grep filename $FPGA_STATUS | awk '{ print $5 }'
+        grep date $FPGA_STATUS |  awk '{print $3}'
+        head -n 1 $FPGA_STATUS | awk '{ print $3 }'
+}
+
 load_fpga() {
 	fpga_image_good=$1
 	echo load FPGA $fpga_image_good
-	echo load.fpga loaded $fpga_image_good >/tmp/fpga_status
+	echo load.fpga loaded $fpga_image_good >$FPGA_STATUS
 	is_gzip_file $fpga_image_good
 	if [ $? -eq 0 ]; then
 		gunzip -c $fpga_image_good | \
-			/bin/xiloader -L 2>>/tmp/fpga_status
+			/bin/xiloader -L 2>>$FPGA_STATUS
 	else
-		/bin/xiloader -L $fpga_image_good 2>>/tmp/fpga_status
+		/bin/xiloader -L $fpga_image_good 2>>$FPGA_STATUS
 	fi
+	echo $(fpga_check) > /etc/acq400/0/fpga_version
 	if [ $? -ne 0 ]; then
 		echo "ERROR FPGA load failed launch emergency shell"
 		/bin/sh

@@ -18,13 +18,5 @@ patch_check() {
 	fi
 }
 
-fpga_check() {
-	grep filename /tmp/fpga_status | awk '{ print $5 }'
-	grep date /tmp/fpga_status | awk '{print $3}'
-	head -n 1 /tmp/fpga_status | awk '{ print $3 }'
-}
-
-
 mkdir -p /etc/acq400/0
 echo $(patch_check) > /etc/acq400/0/software_version
-echo $(fpga_check) > /etc/acq400/0/fpga_version
