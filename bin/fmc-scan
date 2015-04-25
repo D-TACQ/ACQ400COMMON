@@ -227,7 +227,6 @@ FPGA_STATUS=/tmp/fpga_status
 fpga_check() {
         grep filename $FPGA_STATUS | awk '{ print $5 }'
         grep date $FPGA_STATUS |  awk '{print $3}'
-        head -n 1 $FPGA_STATUS | awk '{ print $3 }'
 }
 
 load_fpga() {
