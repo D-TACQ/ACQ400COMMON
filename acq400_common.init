@@ -9,6 +9,7 @@ ln -s /usr/local/bin/soft_trigger /etc/acq400/0/soft_trigger
 make-console-links
 
 patch_check() {
+	head -n 1 /mnt/version | awk '{ print $2 }'
 	/mnt/bin/check_version >/dev/null
 	if [ $? ]; then
 		echo PATCHED
@@ -16,6 +17,13 @@ patch_check() {
 		echo CLEAN
 	fi
 }
-	
-echo $(head -n 1 /mnt/version | awk '{ print $2 }') $(patch_check) >/tmp/version
 
+fpga_check() {
+	grep filename /tmp/fpga_status | awk '{ print $5 }'
+	grep date /tmp/fpga_status | awk '{print $3}'
+	head -n 1 /tmp/fpga_status | awk '{ print $3 }'
+}
+
+
+echo $(patch_check) > /etc/software_version
+echo $(fpga_check) > /etc/fpga_version
