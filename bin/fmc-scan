@@ -75,6 +75,7 @@ MTYPES=""
 
 decode_fru_success=0
 
+
 decode_fru() {
 	
 	site=$1
@@ -111,8 +112,22 @@ decode_fru() {
 	echo $M > $sdir/MTYPE
 	echo $FRU_SERIAL > $sdir/SERIAL
 	echo "$FRU_MAN" > $sdir/MANUFACTURER	
-	echo $FRU_PART_NUM > $sdir/PART_NUM
+	echo $FRU_PART_NUM > $sdir/PART_NUM	
 	
+	caldef=/dev/sites/${site}/caldef.xml	
+	if [ -e /mnt/local/cal/$FRU_SERIAL.xml ]; then
+		echo Calibration found site:$site $FRU_SERIAL.xml
+		cp /mnt/local/cal/$FRU_SERIAL.xml ${caldef} 
+	else
+		PN="${FRU_PART_NUM%% *}"
+		TYP="${PN%%-*}"
+		if [ -e /usr/local/cal/${TYP}-defcal.xml ]; then
+			cp /usr/local/cal/${TYP}-defcal.xml ${caldef}
+			echo "Calibration default installed site:$site /usr/local/cal/${TYP}-defcal.xml
+		else
+			echo "WARNING: no calibration or default found for site:$site type:${TYP}"
+		fi	
+	fi
 	_IFS=$IFS
 	IFS='-'
 	let ii=0
