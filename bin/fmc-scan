@@ -113,23 +113,7 @@ decode_fru() {
 	echo $FRU_SERIAL > $sdir/SERIAL
 	echo "$FRU_MAN" > $sdir/MANUFACTURER	
 	echo $FRU_PART_NUM > $sdir/PART_NUM	
-	
-	caldef=/dev/sites/${site}/caldef.xml
-	calcal=/mnt/local/cal/$FRU_SERIAL.xml	
-	if [ -e ${calcal} ]; then
-		echo "Calibration found site:$site ${calcal}"
-		cp ${calcal} ${caldef} 
-	else
-		PN="${FRU_PART_NUM%% *}"
-		TYP="${PN%%-*}"
-		defcal=/usr/local/cal/${TYP}-defcal.xml
-		if [ -e ${defcal} ]; then
-			cp ${defcal} ${caldef}
-			echo "Calibration default installed site:$site ${defcal}"
-		else
-			echo "WARNING: no calibration or default found for site:$site type:${TYP}"
-		fi	
-	fi
+
 	_IFS=$IFS
 	IFS='-'
 	let ii=0
