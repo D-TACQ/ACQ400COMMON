@@ -38,7 +38,15 @@ do
 		if [ ! -e /dev/sites/$site ]; then  
 			mkdir /dev/sites/$site
 			let BUS=$site+1
-			ln -s /sys/bus/i2c/devices/${BUS}-0050/eeprom /dev/sites/$site
+			# mtca shim puts the eeprom at non-standard address
+			for ba in 0050 0051 0052
+			do
+				eeprom=/sys/bus/i2c/devices/${BUS}-${ba}/eeprom
+				if [ -e ${eeprom} ]; then
+					ln -s ${eeprom} /dev/sites/$site
+					break
+				fi
+			done
 			echo 1 >/dev/gpio/LED/FMC${site}_R
 		fi
 		let module_count=$module_count+1	
