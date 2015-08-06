@@ -66,7 +66,7 @@ aappend() {
 get_fpga_spec() {
 #generated from filename   : ACQ2006_TOP_02_02_ff_ff_ff_40
 # pick out the filename and remove leading _ (then mismatches are by site#)
-	xiloader $* 2>&1 | grep generated | awk '{ print $5 }' | sed -e 's/_//'
+	xiloader $* 2>&1 | grep generated | awk '{ print $5 }' | sed -e 's/_//' | sed -e 's/KMCUA/KMCU/'
 }
 
 let site_count=0
@@ -216,7 +216,7 @@ get_fspec() {
 test_compatible_bitfile() {
 	fspec=$1
 	if [ "x$fspec" != "x" ]; then
-		is_compatible_bitfile $ideal_fpga $fspec
+		is_compatible_bitfile $ideal_fpga $fspec quiet
 		if [ $? -eq 0 ]; then
 			echo +++ compatible bitfile $fspec
 			fpga_image_good=$1
