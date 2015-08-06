@@ -36,7 +36,7 @@ foreach myfield $myspec {
 #			acq425-2000 is compatible with acq425-1000 .. not other way round
 		;		
 	} else {
-		if {verbose == 1} {
+		if {$verbose == 1} {
 			puts "WARNING: not a compatible bitfile, mismatch at $ii"
 		}
 		exit 1
