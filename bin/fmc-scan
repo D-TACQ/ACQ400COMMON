@@ -266,7 +266,8 @@ if [ "x$PREFERRED_BITFILE" != "x" ]; then
 fi
 
 if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in /mnt/*.bit* /mnt/fpga.d/*.bit*
+	for file in /mnt/${FMC_SCAN_FPGA}*.bit* \
+			/mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
 	do
 		test_identical_bitfile $(get_fspec $file)
 		if [ "x$fpga_image_good" != "x" ]; then
@@ -277,7 +278,8 @@ if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
 fi
 
 if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in /mnt/*.bit* $(ls /mnt/fpga.d/*.bit* | sort -r)
+	for file in /mnt/${FMC_SCAN_FPGA}*.bit* \
+		$(ls /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit* | sort -r)
 	do
 		test_compatible_bitfile $(get_fspec $file)
 		if [ "x$fpga_image_good" != "x" ]; then
