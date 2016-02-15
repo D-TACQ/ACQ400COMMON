@@ -308,10 +308,11 @@ source /etc/sites
 
 SEP=""
 SITELIST=""
-for site in 0 $(echo $SITES | tr ,C \  )
+eval $SITES
+for site in 0 $(echo $sites | tr ,C \  )
 do
-	model=cat /etc/acq400/$site/MODEL | awk '{ print $1 }'
-	SITELIST="${SITELIST}${SEP}${model})"
+	model=$(cat /etc/acq400/$site/MODEL | tr -c [A-Za-z] | awk '{ print $1 }')
+	SITELIST="${SITELIST}${SEP}S$site=${model}"
 	SEP=","
 done
 
