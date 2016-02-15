@@ -312,7 +312,7 @@ eval $SITES
 for site in 0 $(echo $sites | tr ,C \  )
 do
 	model=$(cat /etc/acq400/$site/MODEL | tr -d [A-Za-z] | awk '{ print $1 }')
-	SITELIST="${SITELIST}${SEP}S$site=${model}"
+	SITELIST="${SITELIST}${SEP}${site}=${model}"
 	SEP=","
 done
 
