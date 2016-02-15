@@ -306,13 +306,17 @@ echo $GOOD_SITES >>/etc/sites
 
 source /etc/sites
 
+get_model_code() {
+	cat /etc/acq400/$site/MODEL | tr -d [A-Za-z] | awk '{ print $1 }'
+}
+
 SEP=""
-SITELIST=""
+SITELIST=$(get_model_code 0)
 eval $SITES
-for site in 0 $(echo $sites | tr ,C \  )
+for site in $(echo $sites | tr ,C \  )
 do
 	model=$(cat /etc/acq400/$site/MODEL | tr -d [A-Za-z] | awk '{ print $1 }')
-	SITELIST="${SITELIST}${SEP}${site}=${model}"
+	SITELIST="${SITELIST}${SEP}${site}=$(get_model_code $site)"
 	SEP=","
 done
 
