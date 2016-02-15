@@ -307,7 +307,7 @@ echo $GOOD_SITES >>/etc/sites
 source /etc/sites
 
 SEP=""
-for site in 0 $sites
+for site in 0 $SITES
 do
 	echo "$SEP$site=$(cat /etc/acq400/$site/MODEL)" >>/etc/acq400/0/SITELIST
 	SEP=","
