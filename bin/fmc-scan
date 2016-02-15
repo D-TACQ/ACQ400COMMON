@@ -306,6 +306,14 @@ echo $GOOD_SITES >>/etc/sites
 
 source /etc/sites
 
+SEP=""
+for site in 0 $sites
+do
+	echo "$SEP$site=$(cat /etc/$site/MODEL)" >>/etc/sites/0/SITELIST
+	SEP=","
+done
+
+
 if [ "x$sites" = "x$good_sites" ]; then
 	echo ++ Sites populated: $site_count ALL GOOD
 else
