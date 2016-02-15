@@ -310,11 +310,12 @@ SEP=""
 SITELIST=""
 for site in 0 $(echo $SITES | tr ,C \  )
 do
-	SITELIST="${SITELIST}${SEP}${site}=$(cat /etc/acq400/$site/MODEL)"
+	model=cat /etc/acq400/$site/MODEL | awk '{ print $1 }'
+	SITELIST="${SITELIST}${SEP}${model})"
 	SEP=","
 done
 
-echo "$SITELIST" >/etc/sites/0/SITELIST
+echo "$SITELIST" >/etc/acq400/0/SITELIST
 
 if [ "x$sites" = "x$good_sites" ]; then
 	echo ++ Sites populated: $site_count ALL GOOD
