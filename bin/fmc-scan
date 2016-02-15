@@ -311,7 +311,7 @@ get_model_code() {
 }
 
 SEP=""
-SITELIST=$(get_model_code 0)
+SITELIST=$(get_model_code 0 | tr -d 0)
 eval $SITES
 for site in $(echo $sites | tr ,C \  )
 do
