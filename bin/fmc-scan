@@ -307,12 +307,14 @@ echo $GOOD_SITES >>/etc/sites
 source /etc/sites
 
 SEP=""
-for site in 0 $SITES
+SITELIST=""
+for site in 0 $(echo $SITES | tr ,C \  )
 do
-	echo "$SEP$site=$(cat /etc/acq400/$site/MODEL)" >>/etc/acq400/0/SITELIST
+	SITELIST="${SITELIST}${SEP}${site}=$(cat /etc/acq400/$site/MODEL)"
 	SEP=","
 done
 
+echo "$SITELIST" >/etc/sites/0/SITELIST
 
 if [ "x$sites" = "x$good_sites" ]; then
 	echo ++ Sites populated: $site_count ALL GOOD
