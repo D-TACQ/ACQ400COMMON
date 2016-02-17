@@ -213,7 +213,7 @@ get_fspec() {
 		echo $fspec
 	fi
 }
-test_compatible_bitfile() {
+compatible_bit() {
 	fspec=$1
 	if [ "x$fspec" != "x" ]; then
 		is_compatible_bitfile $ideal_fpga $fspec quiet
@@ -224,7 +224,7 @@ test_compatible_bitfile() {
 	fi		
 }
 
-test_identical_bitfile() {
+identical_bit() {
 	if [ "x$ideal_fpga" = "x$1" ]; then
 		echo +++ identical bitfile
 		fpga_image_good=$1
@@ -256,62 +256,34 @@ load_fpga() {
 	fi	
 }
 
-if [ "x$PREFERRED_BITFILE" != "x" ]; then
-	if [ -a -e $PREFERRED_BITFILE ]; then
-	 	test_compatible_bitfile $(get_fspec $PREFERRED_BITFILE)
-		if [ "x$fpga_image_good" != "x" ]; then
-			load_fpga $PREFERRED_BITFILE
-		fi
+select_fpga() {
+		filter=$1;shift
+		for file in $(ls $* | sort -r)
+		do
+			if [ -e $file ]; then
+				$filter $(get_fspec $file)
+				if [ "x$fpga_image_good" != "x" ]; then
+					load_fpga $file
+					break
+				fi
+			fi
+		done
+}
+
+loaded() {
+	if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
+		echo 
+	else
+		echo 1
 	fi
-fi
+}
 
-if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in /mnt/${FMC_SCAN_FPGA}*.bit*
-	do
-		if [ -e $file ]; then
-			test_identical_bitfile $(get_fspec $file)
-			if [ "x$fpga_image_good" != "x" ]; then
-				load_fpga $file
-				break
-			fi
-		fi
-	done
-fi
-if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in /mnt/${FMC_SCAN_FPGA}*.bit*
-	do
-		if [ -e $file ]; then
-			test_compatible_bitfile $(get_fspec $file)
-			if [ "x$fpga_image_good" != "x" ]; then
-				load_fpga $file
-				break
-			fi
-		fi
-	done
-fi
-if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
-	do
-		if [ -e $file ]; then
-			test_identical_bitfile $(get_fspec $file)
-			if [ "x$fpga_image_good" != "x" ]; then
-				load_fpga $file
-				break
-			fi
-		fi
-	done
-fi
+[ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
+[ $(loaded) ] || select_fpga identical_bit  /mnt/${FMC_SCAN_FPGA}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${FMC_SCAN_FPGA}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
 
-if [ "x$fpga_image_good" = "x" -a $module_count != 0 ]; then
-	for file in $(ls /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit* | sort -r)
-	do
-		test_compatible_bitfile $(get_fspec $file)
-		if [ "x$fpga_image_good" != "x" ]; then
-			load_fpga $file
-			break
-		fi
-	done
-fi
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
