@@ -1,0 +1,54 @@
+#!/usr/local/bin/expect
+# is_compatible_bitfile myspec filespec
+# myspec is a carrier+module definition eg ACQ2006_TOP_02_ff_ff_ff_ff_80
+# filespec is a bit file     definition eg ACQ2006_TOP_02_02_ff_ff_ff_80
+# they're compatible IF each field in myspec matches filespec OR is ff
+
+# Identical:
+# myspec 05_ff, matchspec 05_05
+
+if {$argc < 2} {
+	puts "usage is is_compatible_bitfile myspec filespec"
+	exit 1	
+}
+if {$argc > 2} {
+	set verbose [lindex $argv 2]
+} else {
+	set verbose 1
+}
+set myspec [lindex $argv 0]
+set filespec [lindex $argv 1]
+
+puts "myspec $myspec filespec $filespec"
+
+set myspec [split $myspec _]
+set filespec [split $filespec _]
+
+set my_last_spec ""
+set ii 0
+foreach myfield $myspec {
+	set ffield [lindex $filespec $ii]
+	
+	if {$myfield != "ff"} {
+		set my_last_spec $myfield
+	} else {
+		set myfield $my_last_spec
+	}
+	puts "here with myfield $myfield ffield $ffield"
+	if {$myfield == $ffield} {
+		;
+	} elseif {$myfield == "62"} {
+# 			ignore DIO432_PMOD	
+		;		
+	} else {
+		if {$verbose == 1} {
+			puts "WARNING: not a identical bitfile, mismatch at $ii"
+		}
+		exit 1
+	} 
+	incr ii
+}
+
+exit 0
+
+

@@ -225,9 +225,13 @@ compatible_bit() {
 }
 
 identical_bit() {
-	if [ "x$ideal_fpga" = "x$1" ]; then
-		echo +++ identical bitfile
-		fpga_image_good=$1
+	fspec=$1
+	if [ "x$fspec" != "x" ]; then
+		is_identical_bitfile $ideal_fpga $fspec quiet
+		if [ $? -eq 0 ]; then
+			echo +++ identical bitfile
+			fpga_image_good=$1
+		fi
 	fi
 }
 
