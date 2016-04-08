@@ -29,23 +29,26 @@ set ii 0
 foreach myfield $myspec {
 	set ffield [lindex $filespec $ii]
 	
-	if {$myfield != "ff"} {
-		set my_last_spec $myfield
+	if {($myfield == "ff") && ($ffield == "ff")} {
+	 	;
 	} else {
-		set myfield $my_last_spec
-	}
-	puts "here with myfield $myfield ffield $ffield"
-	if {$myfield == $ffield} {
-		;
-	} elseif {$myfield == "62"} {
-# 			ignore DIO432_PMOD	
-		;		
-	} else {
-		if {$verbose == 1} {
-			puts "WARNING: not a identical bitfile, mismatch at $ii"
+		if {$myfield != "ff"} {
+			set my_last_spec $myfield
+		} else {
+			set myfield $my_last_spec
 		}
-		exit 1
-	} 
+#		puts "here with myfield $myfield ffield $ffield"
+		if {$myfield == $ffield} {
+			;
+		} elseif {$myfield == "62"} {	# ignore DIO432_PMOD	
+			;
+		} else {
+			if {$verbose == 1} {
+				puts "WARNING: not a identical bitfile, mismatch at $ii"
+			}
+			exit 1
+		} 
+	}
 	incr ii
 }
 
