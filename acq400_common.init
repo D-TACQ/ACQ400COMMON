@@ -17,11 +17,7 @@ make-console-links
 patch_check() {
 	head -n 1 /mnt/version | awk '{ print $2 }'
 	/mnt/bin/check_version >/dev/null
-	if [ $? ]; then
-		echo PATCHED
-	else
-		echo CLEAN
-	fi
+	[ $? -ne 0 ] && echo PATCHED
 }
 
 mkdir -p /etc/acq400/0
