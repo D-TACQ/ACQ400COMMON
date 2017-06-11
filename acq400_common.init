@@ -11,8 +11,6 @@ MODEL=${MODEL#*/}
 echo $MODEL >/etc/acq400/0/MODEL
 
 ln -s /usr/local/bin/soft_trigger /etc/acq400/0/soft_trigger
-# may need to do this again later if more services are defined
-make-console-links
 
 patch_check() {
 	head -n 1 /mnt/version | awk '{ print $2 }'
@@ -26,6 +24,8 @@ echo $(patch_check) > /etc/acq400/0/software_version
 # customised for acq400
 
 cat - >> /etc/services <<EOF
+ssh             22/tcp         # SSH
+http            80/tcp          www www-http    # WorldWideWeb HTTP
 acq4xx-epics-console		2222/tcp
 acq4xx-aimonitor-console	2223/tcp
 acq4xx-mdsshell-console		2224/tcp
@@ -36,4 +36,6 @@ EOF
 sort_services
 
 
+# may need to do this again later if more services are defined
+make-console-links
 
