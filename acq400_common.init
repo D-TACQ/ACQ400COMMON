@@ -22,3 +22,18 @@ patch_check() {
 
 mkdir -p /etc/acq400/0
 echo $(patch_check) > /etc/acq400/0/software_version
+# /etc/services:
+# customised for acq400
+
+cat - >> /etc/services <<EOF
+acq4xx-epics-console		2222/tcp
+acq4xx-aimonitor-console	2223/tcp
+acq4xx-mdsshell-console		2224/tcp
+acq4xx-transient-console	2225/tcp
+acq4xx-nowhere-console		2226/tcp
+acq4xx-transient-log-console	2235/tcp
+EOF
+sort_services
+
+
+
