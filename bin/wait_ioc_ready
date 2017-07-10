@@ -1,0 +1,11 @@
+#!/bin/sh
+
+FN=/usr/local/epics/scripts/wait_ioc_ready
+
+while [ ! -e $FN ]; do
+	sleep 3
+done
+
+exec $FN
+
+
