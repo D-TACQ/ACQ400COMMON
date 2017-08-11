@@ -24,10 +24,11 @@ set filespec [split $filespec _]
 set ii 0
 foreach myfield $myspec {
 	set ffield [lindex $filespec $ii]
+	set sl [string length $myfield]
 	
 	if {$myfield == "ff"} {
 		;			
-	} elseif {$myfield == $ffield} {
+	} elseif {[string compare -length $sl $myfield $ffield] == 0} {
 		;
 	} elseif {$myfield == "62"} {
 # 			ignore DIO432_PMOD	
