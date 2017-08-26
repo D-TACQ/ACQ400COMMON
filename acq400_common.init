@@ -13,6 +13,12 @@ echo $DTSN >/etc/acq400/0/SERIAL
 
 ln -s /usr/local/bin/soft_trigger /etc/acq400/0/soft_trigger
 
+[ -e /mnt/local/sysconfig/localtime ] && cp /mnt/local/sysconfig/localtime /etc
+# possible to make wholesale changes to /etc, but insist on tarball to get
+# permisssions right.
+[ -e /mnt/local/sysconfig/etc.tgz ] && \
+	tar xvzf /mnt/local/sysconfig/etc.tgz -C /
+
 patch_check() {
 	head -n 1 /mnt/version | awk '{ print $2 }'
 	/mnt/bin/check_version >/dev/null
