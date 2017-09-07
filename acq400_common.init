@@ -6,6 +6,10 @@ mount -t ramfs ram /etc/acq400
 mkdir /etc/acq400/0
 
 source /tmp/u-boot_env
+if [ "x${EBREAK}" = "xyes" ]; then
+	echo BREAK to emergency shell ^D when done
+	PS1="${PS1%>*} EBREAK ${PS1#*>}" /bin/sh
+fi
 MODEL=${devicetree_image%*.dtb}; 
 MODEL=${MODEL#*/}
 echo $MODEL >/etc/acq400/0/MODEL
