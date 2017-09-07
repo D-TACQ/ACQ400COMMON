@@ -22,6 +22,10 @@ set filespec [lindex $argv 1]
 puts "myspec $myspec filespec $filespec"
 
 set myspec [split $myspec _]
+while {[llength $myspec] <= 2} {
+	set myspec [lappend myspec ff]
+}
+
 set filespec [split $filespec _]
 
 set my_last_spec ""
