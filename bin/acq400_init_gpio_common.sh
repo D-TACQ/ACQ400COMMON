@@ -30,10 +30,20 @@ setAL() {
 	fi
 }
 mkln() {
-	ln -s $PWD/$1/value /dev/gpio/$2
-	if [ "x$3" = "xAL" ]; then
-		setAL $1
-	fi
+	gpn=$1
+	ln -s $PWD/$gpn/value /dev/gpio/$2
+	shift;shift;
+	while [ "x$1" != "x" ]; do
+		case $1 in
+		AL)
+			setAL $gpn;;
+		IN)
+			echo in > $gpn/direction;;
+		OUT)
+			echo out > $gpn/direction;;
+		esac
+		shift
+	done
 }
 
 lnAL() {
