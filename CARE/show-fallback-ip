@@ -1,0 +1,29 @@
+#!/bin/sh
+# show fallback up.
+
+GOODSHA="133db8eeb4c5d6d3a38bbce89187eae4a5f89128  /etc/network/default-networkrc"
+
+SHA1="$(sha1sum /etc/network/default-networkrc)"
+
+if [ "x$GOODSHA" != "x$SHA1" ]; then
+	echo "WARNING: /etc/network/default-networkrc has changed, result may be invalid"
+fi
+
+get_mac_address() {
+        cat /sys/class/net/eth0/address
+}
+
+
+MAC=$(get_mac_address)
+
+echo "MAC ADDRESS $MAC"
+
+let DMINOR=$(printf "%d" 0x$(echo ${MAC##*:}))
+let IPMINOR="$DMINOR==200? 200: $DMINOR%200"
+IP=192.168.0.$IPMINOR
+echo +++ fallback static ip $IP
+
+if [ -e /mnt/local/network ]; then
+	echo WARNING /mnt/local/network may override
+	cat /mnt/local/network
+fi
