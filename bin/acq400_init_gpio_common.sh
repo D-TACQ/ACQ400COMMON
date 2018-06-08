@@ -45,6 +45,10 @@ mkln() {
 		shift
 	done
 }
+mklnrm() {
+	rm -f /dev/gpio/$2
+	mkln $*	
+}
 
 lnAL() {
 	setAL $1;ln -s $1/value $2	
