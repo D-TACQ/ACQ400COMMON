@@ -29,12 +29,29 @@ setAL() {
 		echo 0 >$1/value
 	fi
 }
+
+
+lnAL() {
+	setAL $1;ln -s $1/value $2	
+}
+
+lnALO() {
+	setAL $1; echo 0 >$1/value; ln -s $1/value $2	
+}
+
+lnAH() {
+	ln -s $1/value $2	
+}
+
+
 mkln() {
 	gpn=$1
 	ln -s $PWD/$gpn/value /dev/gpio/$2
 	shift;shift;
 	while [ "x$1" != "x" ]; do
 		case $1 in
+		ALO)
+			setALO $gpn;;
 		AL)
 			setAL $gpn;;
 		IN)
@@ -49,19 +66,6 @@ mklnrm() {
 	rm -f /dev/gpio/$2
 	mkln $*	
 }
-
-lnAL() {
-	setAL $1;ln -s $1/value $2	
-}
-
-lnALO() {
-	setAL $1; echo 0 >$1/value; ln -s $1/value $2	
-}
-
-lnAH() {
-	ln -s $1/value $2	
-}
-
 
 i2c_reset() {
 	setHI /dev/gpio/I2C_RESET
