@@ -54,8 +54,8 @@ mkln() {
 			setAL $gpn;;
 		ALO)
 			echo out > $gpn/direction
-			echo 1 >$1/active_low
-			echo 0 >$1/value;;
+			echo 1 >$gpn/active_low
+			echo 0 >$gpn/value;;
 		IN)
 			echo in > $gpn/direction;;
 		OUT)
