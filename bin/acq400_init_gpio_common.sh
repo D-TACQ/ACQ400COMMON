@@ -50,10 +50,12 @@ mkln() {
 	shift;shift;
 	while [ "x$1" != "x" ]; do
 		case $1 in
-		ALO)
-			setALO $gpn;;
 		AL)
 			setAL $gpn;;
+		ALO)
+			echo out > $gpn/direction
+			echo 1 >$1/active_low
+			echo 0 >$1/value;;
 		IN)
 			echo in > $gpn/direction;;
 		OUT)
