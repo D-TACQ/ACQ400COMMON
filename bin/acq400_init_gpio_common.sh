@@ -12,6 +12,12 @@ getchip() {
 	ls -l gpiochip* | grep -q $addr
 }
 
+get_gpiochip() 
+{
+	echo $(basename $(echo /sys/bus/i2c/devices/$1-$2/gpio/gpiochip*))	
+}
+
+
 setHI() {
 	echo 1 > $1
 }
