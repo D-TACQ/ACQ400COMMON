@@ -13,6 +13,7 @@ if [ "$FMC_SCAN_SITES" = "" ]; then
 	echo ERROR: FMC_SCAN_SITES not set
 	exit 1
 fi
+
 scan_done=/var/run/fmc-scan-done
 if [ -e $scan_done ]; then
 	echo  $scan_done exists, looks like the scan has already completed
@@ -197,7 +198,10 @@ do
 	ideal_fpga="${ideal_fpga}_$(get_mtype $site)"
 done
 
-
+if [ $COMMS_SITE != "" ]; then
+    comms=$(get_mtype $site) 
+    ideal_fpga="${ideal_fpga}_${comms}"
+fi
 
 
 fpga_image_good=""
