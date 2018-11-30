@@ -199,7 +199,7 @@ do
 done
 
 if [ $COMMS_SITE != "" ]; then
-    comms=$(get_mtype $site) 
+    comms=$(get_mtype $COMMS_SITE) 
     ideal_fpga="${ideal_fpga}_${comms}"
 fi
 
