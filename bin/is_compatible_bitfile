@@ -27,7 +27,7 @@ foreach myfield $myspec {
 	set sl [string length $myfield]
 	
 	if {$myfield == "ff"} {
-		;			
+		;
 	} elseif {[string compare -length $sl $myfield $ffield] == 0} {
 		;
 	} elseif {$myfield == "62"} {
@@ -35,7 +35,15 @@ foreach myfield $myspec {
 		;
 	} elseif {$myfield == "A5" && $ffield == "05"} {
 #			acq425-2000 is compatible with acq425-1000 .. not other way round
-		;		
+		;
+	} elseif {$ii == 6} {
+# new name convention .. could be a DSP module in 6, check 7 as well		
+		set ffield2  [lindex $filespec 7]
+		if {[string compare -length $sl $myfield $ffield] == 0} {
+			puts "SUCCESS: match on new-style comms field 7"
+		} else {
+			puts "WARNING: failed to match on field 7"
+		}
 	} else {
 		if {$verbose == 1} {
 			puts "WARNING: not a compatible bitfile, mismatch at $ii"
