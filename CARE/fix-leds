@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd /dev/gpio/LED
+for led in $*; do
+    echo $(cat $led) > $led
+done
+
+
