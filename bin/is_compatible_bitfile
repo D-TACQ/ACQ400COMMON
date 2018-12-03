@@ -5,7 +5,7 @@
 # they're compatible IF each field in myspec matches filespec OR is ff
 
 if {$argc < 2} {
-	puts "usage is is_compatible_bitfile myspec filespec"
+	puts "usage is_compatible_bitfile myspec filespec"
 	exit 1	
 }
 if {$argc > 2} {
@@ -23,14 +23,13 @@ set filespec [split $filespec _]
 
 # myspec
 # ACQ2106TOP_08_08_08_08_08_08_90
-# ii=0    1   2  3  4  5  6  7  8
 # fspec variant 1
 # ACQ2106TOP_08_08_08_08_08_08_9011
 # fspec variant 2
 # ACQ2106TOP_08_08_08_08_08_08_9999_9011
-set ii 0
+set site 0
 foreach myfield $myspec {
-	set ffield [lindex $filespec $ii]
+	set ffield [lindex $filespec $site]
 	set sl [string length $myfield]
 	
 	if {$myfield == "ff"} {
@@ -43,21 +42,21 @@ foreach myfield $myspec {
 	} elseif {$myfield == "A5" && $ffield == "05"} {
 #			acq425-2000 is compatible with acq425-1000 .. not other way round
 		;
-	} elseif {$ii == 7} {
+	} elseif {$site == 7} {
 # new name convention .. could be a DSP module in 7, check 8 as well		
-		set ffield2  [lindex $filespec [expr $ii + 1]]
+		set ffield2  [lindex $filespec [expr $site + 1]]
 		if {[string compare -length $sl $myfield $ffield2] == 0} {
-			puts "SUCCESS: match on new-style comms field $ii"
+			puts "SUCCESS: match on new-style comms field $site"
 		} else {
-			puts "WARNING: failed to match on field $ii"
+			puts "WARNING: failed to match on field $site"
 		}
 	} else {
 		if {$verbose == 1} {
-			puts "WARNING: not a compatible bitfile, mismatch at $ii"
+			puts "WARNING: not a compatible bitfile, mismatch at $site"
 		}
 		exit 1
 	} 
-	incr ii
+	incr site
 }
 
 exit 0
