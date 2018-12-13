@@ -48,7 +48,8 @@ foreach myfield $myspec {
 		if {[string compare -length $sl $myfield $ffield2] == 0} {
 			puts "SUCCESS: match on new-style comms field $site"
 		} else {
-			puts "WARNING: failed to match on field $site"
+			puts "WARNING: failed to match on field $site not a compatible bitfile"
+			exit 1
 		}
 	} else {
 		if {$verbose == 1} {
