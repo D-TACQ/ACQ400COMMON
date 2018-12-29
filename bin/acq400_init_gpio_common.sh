@@ -140,7 +140,45 @@ gpioLED() {
 	echo gpio$lgp
 }
 
-
+hook_hwmon() {
+# OK, this isn't gpio, but it's handy to put it here:
+	mkdir -p /dev/hwmon
+	
+	id7417=0
+	for hwmon in /sys/class/hwmon/hwmon* /sys/bus/platform/devices/f8007100.adc/iio\:device0
+	do
+		switch $(cat $hwmon/name)
+		case ad7417)
+			DST=/dev/hwmon/$id7417
+			mkdir $DST
+			case $id7417 in
+			0)
+				ln -s ${hwmon}/temp1_input ${DST}/temp
+	                        ln -s ${hwmon}/in1_input   ${DST}/15VA_N
+        	                ln -s ${hwmon}/in2_input   ${DST}/15VA_P
+                	        ln -s ${hwmon}/in3_input   ${DST}/5V_P
+                        	ln -s ${hwmon}/in4_input   ${DST}/VADJ;;
+			*)
+	 	                ln -s ${hwmon}/temp1_input ${DST}/temp
+                        	for xx in in1_input in2_input in3_input in4_input
+                        	do
+                                	ln -s ${hwmon}/${xx} ${DST}/${xx%*_input}
+	                        done;;
+			esac
+			let id7417="$id7417+1";;
+		case *eth*)
+			mkdir /dev/hwmon/E
+			ln -s $hwmon/temp1_input /dev/hwmon/E/temp
+		case xadc)
+			ln -s $hwmon /dev/hwmon/Z
+			mkdir $DST
+			for xx in in_temp v_mode vccaux vccbram vccint
+                        do
+                                ln -s ${SRC}/${xx} ${DST}/${xx}
+                        done;;
+		esac
+	done	
+}
 common_end() {
 	echo ++ acq400_init_gpio_common end 01		
 	clear_leds
@@ -149,49 +187,6 @@ common_end() {
 	echo "++ lamp test 99"	
 	clear_leds
 	echo "++ leds all clear now "
-		
-# OK, this isn't gpio, but it's handy to put it here:
-	
-	mkdir -p /dev/hwmon
-	
-	for hwmon in /sys/class/hwmon/hwmon*
-	do
-		S=${hwmon##*n}	
-		SRC=$hwmon/device
-		if [ -e ${SRC}/temp ]; then
-			ID=Z
-		elif [ -e ${SRC}/temp1_input ]; then
-			ID=$S	
-		else
-			continue;
-		fi
-		DST=/dev/hwmon/${ID}
-		mkdir $DST
-		
-		case ${ID} in
-		Z)
-			for xx in temp v v_mode vccaux vccbram vccint
-			do
-				ln -s ${SRC}/${xx} ${DST}/${xx}
-			done;;			
-		0)
-			ln -s ${SRC}/temp1_input ${DST}/temp
-			ln -s ${SRC}/in1_input	 ${DST}/15VA_N
-			ln -s ${SRC}/in2_input	 ${DST}/15VA_P
-			ln -s ${SRC}/in3_input	 ${DST}/5V_P
-			ln -s ${SRC}/in4_input	 ${DST}/VADJ;;
-		*)
-			ln -s ${SRC}/temp1_input ${DST}/temp
-			for xx in in1_input in2_input in3_input in4_input
-			do
-				ln -s ${SRC}/${xx} ${DST}/${xx%*_input}
-			done;;
-		esac					
-	done
-	
-	zmon=/sys/bus/platform/devices/f8007100.ps7-xadc/iio:device0
-	if [ -e $zmon ]; then
-				ln -s $zmon /dev/hwmon/Z
-	fi
+	hook_hwmon		
 	echo ++ acq400_init_gpio_common end 99
 }
