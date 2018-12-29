@@ -147,8 +147,8 @@ hook_hwmon() {
 	id7417=0
 	for hwmon in /sys/class/hwmon/hwmon* /sys/bus/platform/devices/f8007100.adc/iio\:device0
 	do
-		switch $(cat $hwmon/name)
-		case ad7417)
+		case $(cat $hwmon/name) in
+		ad7417)
 			DST=/dev/hwmon/$id7417
 			mkdir $DST
 			case $id7417 in
@@ -166,10 +166,10 @@ hook_hwmon() {
 	                        done;;
 			esac
 			let id7417="$id7417+1";;
-		case *eth*)
+		*eth*)
 			mkdir /dev/hwmon/E
 			ln -s $hwmon/temp1_input /dev/hwmon/E/temp
-		case xadc)
+		xadc)
 			ln -s $hwmon /dev/hwmon/Z
 			mkdir $DST
 			for xx in in_temp v_mode vccaux vccbram vccint
