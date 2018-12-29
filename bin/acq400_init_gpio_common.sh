@@ -168,7 +168,7 @@ hook_hwmon() {
 			let id7417="$id7417+1";;
 		*eth*)
 			mkdir /dev/hwmon/E
-			ln -s $hwmon/temp1_input /dev/hwmon/E/temp
+			ln -s $hwmon/temp1_input /dev/hwmon/E/temp;;
 		xadc)
 			ln -s $hwmon /dev/hwmon/Z
 			mkdir $DST
@@ -176,6 +176,8 @@ hook_hwmon() {
                         do
                                 ln -s ${SRC}/${xx} ${DST}/${xx}
                         done;;
+		*)
+			echo "WARNING: skipping unknown hwmon device $(cat $hwmon/name)";;
 		esac
 	done	
 }
