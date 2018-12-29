@@ -82,6 +82,18 @@ i2c_reset() {
 	echo +++ I2C_RESET done
 }
 
+get_zynq_gpio0() {
+    for file in /sys/class/gpio/gpiochip*; do
+        if [ "$(cat $file/label)" = "zynq_gpio" ]; then
+            CHIP=$(basename $file)
+            echo ${CHIP#gpiochip*}
+            return
+        fi
+    done
+    
+    echo FAILED TO FIND ZYNQ GPIO
+    exit 1   
+}
 common_begin() {
 	echo ++ acq400_init_gpio_common begin
 
@@ -89,17 +101,20 @@ common_begin() {
 	cd /sys/class/gpio
 
 # Zynq GPIO
-	export_gpio  0; setO gpio0
-	mkln gpio0 LED_ACT
+    zgpio0=$(get_zynq_gpio0)
+    LED_ACT=$(($zgpio0 + 0))
+	export_gpio  $LED_ACT; setO gpio$LED_ACT
+	mkln gpio$LED_ACT LED_ACT
 	nice daemon /usr/local/bin/heartbeat
 
-
 # I2C_RESET : use with care, will confuse the ps7 i2c driver
-	export_gpio 9; setO gpio9
-	mkln gpio9 I2C_RESET	AL
+    I2C_RESET=$(($zgpio0 + 9))
+	export_gpio $I2C_RESET; setO gpio$I2C_RESET
+	mkln gpio$I2C_RESET I2C_RESET	AL
 
-	export_gpio 47;	
-	mkln gpio47 EXT_WP AL
+    EXT_WP=$(($zgpio0 + 47))
+	export_gpio $EXT_WP;	
+	mkln gpio$EXT_WP EXT_WP AL
 }
 
 
