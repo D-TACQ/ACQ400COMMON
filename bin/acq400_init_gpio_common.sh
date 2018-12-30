@@ -170,11 +170,11 @@ hook_hwmon() {
 			mkdir /dev/hwmon/E
 			ln -s $hwmon/temp1_input /dev/hwmon/E/temp;;
 		xadc)
-			ln -s $hwmon /dev/hwmon/Z
-			mkdir $DST
+			DST=/dev/hwmon/Z
+			mkdir $DST	
 			for xx in in_temp v_mode vccaux vccbram vccint
                         do
-                                ln -s ${SRC}/${xx} ${DST}/${xx}
+                                ln -s ${hwmon}/${xx} ${DST}/${xx}
                         done;;
 		*)
 			echo "WARNING: skipping unknown hwmon device $(cat $hwmon/name)";;
