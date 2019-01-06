@@ -6,8 +6,8 @@ export_gpio() {
 }
 
 export_gpio_value_ln() {
-	gpn = $1
-	export gpio $gpn
+	gpn=$1
+	export_gpio $gpn
 	ln -s gpio$gpn/value $2	
 }
 
