@@ -5,6 +5,12 @@ export_gpio() {
 	echo $1 > export
 }
 
+export_gpio_value_ln() {
+	gpn = $1
+	export gpio $gpn
+	ln -s gpio$gpn/value $2	
+}
+
 getchip() {
 	addr=$1
 	ls -l gpiochip* | grep $addr | awk '{ print $9 }'
