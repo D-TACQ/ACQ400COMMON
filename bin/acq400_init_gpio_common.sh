@@ -8,7 +8,7 @@ export_gpio() {
 export_gpio_value_ln() {
 	gpn=$1
 	export_gpio $gpn
-	ln -s gpio$gpn/value $2	
+	ln -s /sys/class/gpio/gpio$gpn/value $2	
 }
 
 getchip() {
