@@ -1,75 +1,51 @@
 #!/usr/local/bin/expect
 # usage mb_clk fin fout
 
-set MN "(\[0-9\]*)"
 
-close stdout
-open /var/log/mb_clock.log w
+
+
+if {$argc == 0} {
+	if {[catch {set SF [open /dev/shm/mb_clock r]} ]} {
+		puts "not set"
+	} else {
+		gets $SF line
+		puts $line
+	}
+	return 0
+} elseif {$argc == 2} {
+	exec mb_clk [lindex $argv 0] [lindex $argv 1] action  >& /var/log/mb_clock.log
+	return 0
+} elseif {($argc == 3 && [lindex $argv 2] == "action")} {
+	;
+} else {
+	puts "ERROR: Usage: set_mb_clk fin_kHz fout_kHz"
+	return 1
+}
+
+
+# action runs here 
 
 proc report {message} {
 	set LOG	[open /dev/shm/mb_clock w]
 	puts $LOG $message
 	close $LOG
 }
-proc daemon {} {
-	global MN
-	while {1} {
-		expect {	
-			-re "$MN,$MN" {
-				set FIN  $expect_out(1,string)
-				set FOUT $expect_out(2,string)
-				puts "exec set_mb_clk $FIN $FOUT"
-				exec /usr/local/bin/set_mb_clk $FIN $FOUT
-			}
-			timeout {
-				return 0
-			}
-		}
-	}
-}
 
-# @@todo is daemon mode ever used?. Can we dump it?
+log_user 1
 
-if {$argv0 == "set_mb_clock"} {
-	if {$argc == 1} {
-		set arg1 [lindex $argv 0]
-		if {$arg1 == "-d"} {
-			set timeout -1
-			daemon
-			return 0
-		} else {
-			puts "Usage: set_mb_clk -d"
-			return 1
-		}
-	}
-}
-if {$argc == 0} {
-	if {[catch {set SF [open /dev/shm/mb_clock r]} ]} {
-		puts "not set"
-	} else {
-		gets $SF line
-		puts line
-	}
-	return 0
-} elseif {$argc != 2} {
-	puts "Usage: set_mb_clk fin_kHz fout_kHz"
-	return 1
-}
-
+set MN "(\[0-9\]*)"
+puts "$argv kickoff"
 set FIN  [lindex $argv 0]
 set FOUT [lindex $argv 1]
-
-
 
 spawn ob_calc_527 -o - --fin $FIN $FOUT
 while { 1 } {
 	expect {
-		"find_best_ratio*" {
-			puts "$expect_out(0,string)"
+		-re "find_best_ratio op_range $MN" {
+			puts "m1:$expect_out(0,string)"
 		}
-		-re "^$MN $MN $MN $MN $MN $MN" {
-			puts "Success S:$expect_out(1,string) A:$expect_out(2,string)"
-			report "$FIN $FOUT"
+		-re "$MN $MN $MN $MN $MN $MN" {
+			puts "m2:S:$expect_out(1,string) A:$expect_out(2,string)"
 			break;
 		}
 		-re "(.*)\n" {
@@ -80,6 +56,7 @@ while { 1 } {
 	}
 }
 
+puts "DONE expecting .. "
 
 set SP  $expect_out(1,string)
 set ACT $expect_out(2,string)
@@ -88,9 +65,7 @@ set RDW $expect_out(4,string)
 set R	$expect_out(5,string)
 set ODW $expect_out(6,string)
 
-set ROOT	"/dev/gpio/CLK/MB"
 
-puts "FIN:$FIN FOUT:$FOUT SP:$SP ACT:$ACT FDW:$FDW RDW:$RDW ODW:$ODW"
 report "FIN:$FIN FOUT:$FOUT SP:$SP ACT:$ACT FDW:$FDW RDW:$RDW ODW:$ODW"
 
 
@@ -101,13 +76,15 @@ proc putBits {root pfx dval} {
 	set bn 0
 	foreach K [lsort $knobs] {
 		set xx [string index $bits $bn]
-#		puts "bits:$bits bn: $bn set.sys $K $xx"
 		set F [open $K w]
 		puts $F $xx
 		incr bn
 	}
 }
 
+set ROOT	"/dev/gpio/CLK/MB"
+
 putBits "$ROOT/FDW/" F $FDW
 putBits "$ROOT/RDW/" R $RDW
 putBits "$ROOT/ODW/" S $ODW
+puts "$argv end"
