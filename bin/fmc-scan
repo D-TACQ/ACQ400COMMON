@@ -329,5 +329,7 @@ else
 	echo ++ Sites populated: $site_count WARNING: FOUND:$sites GOOD:$good_sites
 fi
 
+clean_release_report
+
 echo done > $scan_done
 

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# check if loaded FPGA is in release
+
+PN=$(grep loaded /tmp/fpga_status | awk '{ print $3 }')
+
+if [ "$(dirname $PN)" = "/mnt/fpga.d" ]; then
+	exit 0
+else
+    cmp $PN /mnt/fpga.d/$(basename $PN)
+    if [ $? -ne 1 ]; then
+        ( echo; echo ERROR FPGA image NOT in RELEASE;
+        sha1sum $PN /mnt/fpga.d/$(basename $PN)
+        ) >>/tmp/fpga_status
+    fi
+fi
+
+exit 0
+
