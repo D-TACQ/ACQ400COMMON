@@ -12,10 +12,11 @@ export_gpio_value_ln() {
 }
 
 getchip() {
+	cd /sys/class/gpio/
 	addr=$1
 	ls -l gpiochip* | grep $addr | awk '{ print $9 }'
 	# force exit code ..
-	ls -l gpiochip* | grep -q $addr
+	ls -l gpiochip* | grep -q $addr 
 }
 
 get_gpiochip() 
@@ -35,6 +36,7 @@ setLO() {
 setO() {
 	echo out >$1/direction
 }
+
 setAL() {
 	echo 1 >$1/active_low
 	if [ "$(cat $1/direction)" = "out" ]; then
@@ -42,6 +44,10 @@ setAL() {
 	fi
 }
 
+setOAL() {
+	setO $1
+	setAL $1		
+}
 
 lnAL() {
 	setAL $1;ln -s $1/value $2	
