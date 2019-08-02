@@ -198,7 +198,7 @@ do
 	ideal_fpga="${ideal_fpga}_$(get_mtype $site)"
 done
 
-if [ $COMMS_SITE != "" ]; then
+if [ ! -z $COMMS_SITE ]; then
     comms=$(get_mtype $COMMS_SITE) 
     ideal_fpga="${ideal_fpga}_${comms}"
 fi
