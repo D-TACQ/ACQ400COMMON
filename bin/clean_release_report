@@ -6,13 +6,19 @@ PN=$(grep loaded /tmp/fpga_status | awk '{ print $3 }')
 
 if [ "$(dirname $PN)" = "/mnt/fpga.d" ]; then
 	exit 0
-else
-    cmp $PN /mnt/fpga.d/$(basename $PN)
+fi
+RN=/mnt/fpga.d/$(basename $PN)
+if [ -e $RN ]; then
+    cmp $PN $RN
     if [ $? -ne 0 ]; then
         ( echo; echo ERROR FPGA image NOT in RELEASE;
-        sha1sum $PN /mnt/fpga.d/$(basename $PN)
+        sha1sum $PN $RN
         ) >>/tmp/fpga_status
     fi
+else
+	( echo; 
+	  echo ERROR FPGA image NOT in RELEASE at all;
+	  echo $RN) >> /tmp/fpga_status
 fi
 
 exit 0
