@@ -2,7 +2,7 @@
 
 patch_check() {
 	/mnt/bin/check_version >/dev/null
-	if [ $? ]; then
+	if [ $? -ne 0 ]; then
 		echo PATCHED
 	else
 		echo CLEAN
