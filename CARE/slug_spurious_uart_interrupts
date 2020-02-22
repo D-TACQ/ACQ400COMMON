@@ -1,0 +1,19 @@
+#!/bin/sh
+
+irate() {
+	echo $(/usr/local/CARE/int_rate_mon xuartps 5 1 | head -n 1 | awk '{ print $3 }')
+}
+IRATE=$(irate)
+
+if [  $IRATE -gt 1000 ]; then
+	echo SLUG suspected line noise on /dev/ttyPS0 $IRATE
+	stty -F /dev/ttyPS0 speed 50
+	IRATE=$(irate)
+	if [ $IRATE -lt 10 ]; then
+		echo SLUG suspected line noise on /dev/ttyPS0 $IRATE SUCCESS
+	else
+		echo SLUG suspected line noise on /dev/ttyPS0 $IRATE FAIL
+	fi
+fi
+
+

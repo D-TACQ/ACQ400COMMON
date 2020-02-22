@@ -36,6 +36,8 @@ patch_check() {
 	[ $? -ne 0 ] && echo PATCHED
 }
 
+nice /usr/local/CARE/slug_spurious_uart_interrupts &
+
 echo $(patch_check) > /etc/acq400/0/software_version
 # /etc/services:
 # customised for acq400
