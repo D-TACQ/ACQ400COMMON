@@ -8,6 +8,7 @@ IRATE=$(irate)
 slug_it() {
 if [  $IRATE -gt 1000 ]; then
 	echo SLUG suspected line noise on /dev/ttyPS0 $IRATE
+	sed -ie '/console/a::shutdown:/bin/stty -F /dev/ttyPS0 speed 115200' /etc/inittab
 	sed -ie 's/^console::/#console::/' /etc/inittab
 	kill -HUP 1
 	sleep 1
