@@ -5,8 +5,12 @@ irate() {
 }
 IRATE=$(irate)
 
+slug_it() {
 if [  $IRATE -gt 1000 ]; then
 	echo SLUG suspected line noise on /dev/ttyPS0 $IRATE
+	sed -ie 's/^console::/#console::/' /etc/inittab
+	kill -HUP 1
+	pkill -9 getty
 	stty -F /dev/ttyPS0 speed 50
 	IRATE=$(irate)
 	if [ $IRATE -lt 10 ]; then
@@ -14,6 +18,16 @@ if [  $IRATE -gt 1000 ]; then
 	else
 		echo SLUG suspected line noise on /dev/ttyPS0 $IRATE FAIL
 	fi
+else
+	echo SLUG ttyPS0 interrupts normal NO ACTION	
 fi
+}
 
 
+if [ "x$1" = "xdaemon" ]; then
+	shift;
+	SLEEP=${1:-60}
+	slug_it | /usr/bin/logger -t slug
+else
+	slug_it
+fi
