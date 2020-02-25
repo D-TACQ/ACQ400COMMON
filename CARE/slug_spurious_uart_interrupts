@@ -10,8 +10,9 @@ if [  $IRATE -gt 1000 ]; then
 	echo SLUG suspected line noise on /dev/ttyPS0 $IRATE
 	sed -ie 's/^console::/#console::/' /etc/inittab
 	kill -HUP 1
+	sleep 1
 	pkill -9 getty
-	stty -F /dev/ttyPS0 speed 50
+	stty -F /dev/ttyPS0 speed 50 >/dev/null
 	IRATE=$(irate)
 	if [ $IRATE -lt 10 ]; then
 		echo SLUG suspected line noise on /dev/ttyPS0 $IRATE SUCCESS
