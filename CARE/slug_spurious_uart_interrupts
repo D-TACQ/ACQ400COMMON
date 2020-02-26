@@ -33,6 +33,7 @@ fi
 if [ "x$1" = "xdaemon" ]; then
 	shift;
 	SLEEP=${1:-60}
+	sleep $SLEEP
 	slug_it | /usr/bin/logger -t slug
 else
 	slug_it
