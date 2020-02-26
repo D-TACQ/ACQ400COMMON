@@ -5,16 +5,20 @@ irate() {
 }
 IRATE=$(irate)
 
+KILLSWITCH=/sys/module/xilinx_uartps/parameters/kill_switch_mask
+
 slug_it() {
+
 if [  $IRATE -gt 1000 ]; then
 	echo SLUG suspected line noise on /dev/ttyPS0 $IRATE
-	sed -ie '/console/a::shutdown:/bin/stty -F /dev/ttyPS0 speed 115200' /etc/inittab
-	sed -ie 's/^console::/#console::/' /etc/inittab
-	kill -HUP 1
-	sleep 1
-	pkill -9 getty
-	stty -F /dev/ttyPS0 speed 50 >/dev/null
-	IRATE=$(irate)
+	if [ -e $KILLSWITCH ]; then
+		echo SLUG activate KILLSWITCH
+		echo 65535,0 > $KILLSWITCH
+		sleep 1
+		IRATE=$(irate)
+	else
+		echo SLUG : no KILLSWITCH
+	fi
 	if [ $IRATE -lt 10 ]; then
 		echo SLUG suspected line noise on /dev/ttyPS0 $IRATE SUCCESS
 	else
