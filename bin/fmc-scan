@@ -192,10 +192,16 @@ is_gzip_file() {
 }
 # omit underscore
 ideal_fpga=${FMC_SCAN_FPGA}TOP
-
+ideal1=${FMC_SCAN_FPGA}_TOP
+first_site=1
 for site in $FMC_SCAN_SITES
 do
-	ideal_fpga="${ideal_fpga}_$(get_mtype $site)"
+	mt=$(get_mtype $site)
+	ideal_fpga="${ideal_fpga}_${mt}"
+	if [ $first_site -eq 1 ]; then
+		ideal1="${ideal1}_${mt}"
+		first_site=0
+	fi
 done
 
 if [ ! -z $COMMS_SITE ]; then
@@ -305,11 +311,11 @@ loaded() {
 }
 
 [ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
-[ $(loaded) ] || select_fpga identical_bit  /mnt/${FMC_SCAN_FPGA}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${FMC_SCAN_FPGA}*.bit*
-[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${FMC_SCAN_FPGA}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/DEPR/${FMC_SCAN_FPGA}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/${ideal1}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${ideal1}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${ideal1}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${ideal1}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/DEPR/${ideal1}*.bit*
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
