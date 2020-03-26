@@ -279,15 +279,17 @@ select_fpga() {
 			if [ -e $file ]; then
 				$filter $(get_fspec $file)
 				if [ "x$fpga_image_good" != "x" ]; then
+					echo +++ Internal name consistency check
 					fsi=$(get_fspec_internal $file)
+					fpga_image_good=""
 					compatible_bit $fsi
 					if [ "x$fpga_image_good" != "x" ]; then
+						load_fpga $file
+						break
+					else
 						echo ERROR: selected $file but file name does not match internal $fsi
 						echo "ERROR FPGA load failed launch emergency shell"
 						/bin/sh	
-					else
-						load_fpga $file
-						break
 					fi
 				fi
 			fi
