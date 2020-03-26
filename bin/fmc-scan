@@ -208,7 +208,7 @@ fpga_image_good=""
 
 get_fspec() {
 	if [ -r $1 ]; then
-		fn=$(echo $(basename ${1} | sed -e 's/_TOP/TOP/')
+		fn=$(echo $(basename ${1}) | sed -e 's/_TOP/TOP/')
 		fspec=${fn%%.*}
 		echo $fspec
 	fi
