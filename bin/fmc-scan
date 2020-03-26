@@ -208,6 +208,14 @@ fpga_image_good=""
 
 get_fspec() {
 	if [ -r $1 ]; then
+		fn=$(echo $(basename ${1} | sed -e 's/_TOP/TOP/')
+		fspec=${fn%%.*}
+		echo $fspec
+	fi
+}
+
+get_fspec_internal() {
+	if [ -r $1 ]; then
 		is_gzip_file $1
 		if [ $? -eq 0 ]; then
 			fspec=$(gunzip -c $1 | get_fpga_spec -i -)
@@ -271,8 +279,16 @@ select_fpga() {
 			if [ -e $file ]; then
 				$filter $(get_fspec $file)
 				if [ "x$fpga_image_good" != "x" ]; then
-					load_fpga $file
-					break
+					fsi=$(get_fspec_internal $file)
+					compatible_bit $fsi
+					if [ "x$fpga_image_good" != "x" ]; then
+						echo ERROR: selected $file but file name does not match internal $fsi
+						echo "ERROR FPGA load failed launch emergency shell"
+						/bin/sh	
+					else
+						load_fpga $file
+						break
+					fi
 				fi
 			fi
 		done
