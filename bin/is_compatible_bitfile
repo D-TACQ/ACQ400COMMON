@@ -18,15 +18,16 @@ set filespec [lindex $argv 1]
 
 puts "myspec $myspec filespec $filespec"
 
-set myspec [split $myspec _]
-set filespec [split $filespec _]
+# remove TOP st site 1 at index 1
+set myspec [lreplace [split $myspec _] 1 1]
+set filespec [lreplace [split $filespec _] 1 1]
 
 # myspec
-# ACQ2106TOP_08_08_08_08_08_08_90
+# ACQ2106_TOP_08_08_08_08_08_08_90
 # fspec variant 1
-# ACQ2106TOP_08_08_08_08_08_08_9011
+# ACQ2106_TOP_08_08_08_08_08_08_9011
 # fspec variant 2
-# ACQ2106TOP_08_08_08_08_08_08_9999_9011
+# ACQ2106_TOP_08_08_08_08_08_08_9999_9011
 set site 0
 foreach myfield $myspec {
 	set ffield [lindex $filespec $site]

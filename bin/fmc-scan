@@ -83,8 +83,7 @@ aappend() {
 
 get_fpga_spec() {
 #generated from filename   : ACQ2006_TOP_02_02_ff_ff_ff_40
-# pick out the filename and remove leading _ (then mismatches are by site#)
-	xiloader $* 2>&1 | grep generated | awk '{ print $5 }' | sed -e 's/_//' | sed -e 's/KMCUA/KMCU/'
+	xiloader $* 2>&1 | grep generated | awk '{ print $5 }' | sed -e 's/KMCUA/KMCU/'
 }
 
 let site_count=0
@@ -207,18 +206,12 @@ get_mtype()
 is_gzip_file() {
 	echo $1 | grep -q \.gz$
 }
-# omit underscore
-ideal_fpga=${FMC_SCAN_FPGA}TOP
-ideal1=${FMC_SCAN_FPGA}_TOP
-first_site=1
+
+ideal_fpga=${FMC_SCAN_FPGA}_TOP
 for site in $FMC_SCAN_SITES
 do
 	mt=$(get_mtype $site)
-	ideal_fpga="${ideal_fpga}_${mt}"
-	if [ $first_site -eq 1 ]; then
-		ideal1="${ideal1}_${mt}"
-		first_site=0
-	fi
+	ideal_fpga="${ideal_fpga}_${mt}"	
 done
 
 if [ ! -z $COMMS_SITE ]; then
@@ -231,7 +224,7 @@ fpga_image_good=""
 
 get_fspec() {
 	if [ -r $1 ]; then
-		fn=$(echo $(basename ${1}) | sed -e 's/_TOP/TOP/')
+		fn=$(basename ${1})
 		fspec=${fn%%.*}
 		echo $fspec
 	fi
@@ -281,6 +274,7 @@ load_fpga() {
 	fpga_image_good=$1
 	echo load FPGA $fpga_image_good
 	echo load.fpga loaded $fpga_image_good >$FPGA_STATUS
+	[ "x$NOLOAD" != "x" ] && return
 	is_gzip_file $fpga_image_good
 	if [ $? -eq 0 ]; then
 		gunzip -c $fpga_image_good | \
@@ -328,11 +322,10 @@ loaded() {
 }
 
 [ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
-[ $(loaded) ] || select_fpga identical_bit  /mnt/${ideal1}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${ideal1}*.bit*
-[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${ideal1}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${ideal1}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/DEPR/${ideal1}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/${ideal_fpga}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${ideal_fpga}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${ideal_fpga}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${ideal_fpga}*.bit*
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED

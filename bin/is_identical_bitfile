@@ -1,5 +1,5 @@
 #!/usr/local/bin/expect
-# is_compatible_bitfile myspec filespec
+# is_identical_bitfile myspec filespec
 # myspec is a carrier+module definition eg ACQ2006_TOP_02_ff_ff_ff_ff_80
 # filespec is a bit file     definition eg ACQ2006_TOP_02_02_ff_ff_ff_80
 # they're compatible IF each field in myspec matches filespec OR is ff
@@ -8,7 +8,7 @@
 # myspec 05_ff, matchspec 05_05
 
 if {$argc < 2} {
-	puts "usage is is_compatible_bitfile myspec filespec"
+	puts "usage is_identical_bitfile myspec filespec"
 	exit 1	
 }
 if {$argc > 2} {
@@ -21,12 +21,12 @@ set filespec [lindex $argv 1]
 
 puts "myspec $myspec filespec $filespec"
 
-set myspec [split $myspec _]
+set myspec [lreplace [split $myspec _] 1 1]
 while {[llength $myspec] <= 2} {
 	set myspec [lappend myspec ff]
 }
 
-set filespec [split $filespec _]
+set filespec [lreplace [split $filespec _] 1 1]
 
 set my_last_spec ""
 set ii 0
