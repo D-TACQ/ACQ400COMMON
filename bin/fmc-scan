@@ -294,7 +294,7 @@ load_fpga() {
 
 select_fpga() {
 		filter=$1;shift
-		for file in $(ls $* | sort -r)
+		for file in $(ls $* | sort)
 		do
 			if [ -e $file ]; then
 				$filter $(get_fspec $file)
