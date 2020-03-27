@@ -215,8 +215,11 @@ do
 done
 
 if [ ! -z $COMMS_SITE ]; then
-    comms=$(get_mtype $COMMS_SITE) 
+    comms=$(get_mtype $COMMS_SITE)
+    fglob="${ideal_fpga}*${comms}" 
     ideal_fpga="${ideal_fpga}_${comms}"
+else
+	fglob=${ideal_fpga}
 fi
 
 
@@ -322,10 +325,10 @@ loaded() {
 }
 
 [ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
-[ $(loaded) ] || select_fpga identical_bit  /mnt/${ideal_fpga}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${ideal_fpga}*.bit*
-[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${ideal_fpga}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${ideal_fpga}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${fglob}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit*
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit*
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
