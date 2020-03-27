@@ -14,6 +14,23 @@ if [ "$FMC_SCAN_SITES" = "" ]; then
 	exit 1
 fi
 
+mounted_up=0
+for img in /mnt/ko/*fpga*.img; do
+	if [ -e $img ]; then
+		if [ $mounted_up -eq 0 ]; then
+			mount $img /mnt/fpga.d
+			if [ $? -eq 0 ]; then
+				echo +++ mounted fpga stock $img at /mnt/fpga.d
+				mounted_up=1
+			else
+				echo +++ ERROR: failed to mount fpga stock
+			fi
+		else
+			echo +++ WARNING: multiple fpga stock images found
+		fi
+	fi
+done
+
 scan_done=/var/run/fmc-scan-done
 if [ -e $scan_done ]; then
 	echo  $scan_done exists, looks like the scan has already completed
