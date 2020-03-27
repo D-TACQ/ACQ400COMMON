@@ -56,6 +56,11 @@ foreach myfield $myspec {
 	incr ii
 }
 
+if {[llength $myspec] < [llength $filespec]} {
+	puts "WARNING:$myspec: $filespec is compatible but has extra stuff, so not identical"
+	exit 1
+}
+
 exit 0
 
 
