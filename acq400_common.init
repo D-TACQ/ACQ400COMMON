@@ -31,15 +31,17 @@ ln -s /usr/local/bin/soft_trigger /etc/acq400/0/soft_trigger
 	tar xvzf /mnt/local/sysconfig/etc.tgz -C /
 
 patch_check() {
+(
+	renice 10
 	head -n 1 /mnt/version | awk '{ print $2 }'
 	/mnt/bin/check_version >/dev/null
 	[ $? -ne 0 ] && echo PATCHED
+) > /etc/acq400/0/software_version
 }
 
 daemon /usr/local/CARE/slug_spurious_uart_interrupts daemon 10
+patch_check &
 
-
-echo $(patch_check) > /etc/acq400/0/software_version
 # /etc/services:
 # customised for acq400
 
