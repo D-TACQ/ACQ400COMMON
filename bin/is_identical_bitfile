@@ -19,7 +19,7 @@ if {$argc > 2} {
 set myspec [lindex $argv 0]
 set filespec [lindex $argv 1]
 
-puts "myspec $myspec filespec $filespec"
+puts "is_identical myspec $myspec filespec $filespec"
 
 set myspec [lreplace [split $myspec _] 1 1]
 while {[llength $myspec] <= 2} {

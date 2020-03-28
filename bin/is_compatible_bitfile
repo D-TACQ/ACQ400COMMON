@@ -16,7 +16,7 @@ if {$argc > 2} {
 set myspec [lindex $argv 0]
 set filespec [lindex $argv 1]
 
-puts "myspec $myspec filespec $filespec"
+puts "is_compatible myspec $myspec filespec $filespec"
 
 # remove TOP st site 1 at index 1
 set myspec [lreplace [split $myspec _] 1 1]
