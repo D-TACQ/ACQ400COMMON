@@ -278,13 +278,7 @@ load_fpga() {
 	echo load FPGA $fpga_image_good
 	echo load.fpga loaded $fpga_image_good >$FPGA_STATUS
 	[ "x$NOLOAD" != "x" ] && return
-	is_gzip_file $fpga_image_good
-	if [ $? -eq 0 ]; then
-		gunzip -c $fpga_image_good | \
-			/bin/xiloader -L 2>>$FPGA_STATUS
-	else
-		/bin/xiloader -L $fpga_image_good 2>>$FPGA_STATUS
-	fi
+	gunzip -c $fpga_image_good | /bin/xiloader -L 2>>$FPGA_STATUS
 	echo $(fpga_check) > /etc/acq400/0/fpga_version
 	if [ $? -ne 0 ]; then
 		echo "ERROR FPGA load failed launch emergency shell"
