@@ -294,8 +294,9 @@ load_fpga() {
 
 select_fpga() {
 		filter=$1;shift
-		for file in $(ls $* | sort)
+		for fn in $(ls $* | sed -e 's/.bit.gz//' | sort)
 		do
+			file=${fn}.bit.gz
 			if [ -e $file ]; then
 				$filter $(get_fspec $file)
 				if [ "x$fpga_image_good" != "x" ]; then
@@ -325,10 +326,10 @@ loaded() {
 }
 
 [ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
-[ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${fglob}*.bit*
-[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit*
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit*
+[ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit.gz
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${fglob}*.bit.gz
+[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit.gz
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit.gz
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
