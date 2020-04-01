@@ -319,11 +319,14 @@ loaded() {
 	fi
 }
 
+wildglob=$(echo $fglob | sed -e 's/ff/??/g')
+
 [ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
 [ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit.gz
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${fglob}*.bit.gz
+[ $(loaded) ] || select_fpga compatible_bit /mnt/${wildglob}*.bit.gz
 [ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit.gz
 [ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit.gz
+[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${wildglob}*.bit.gz
 
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
