@@ -1,8 +1,14 @@
 #!/bin/sh
 
+if [ "x$FIX_LEDS_SLEEP" != "x" ]; then
+	sleep $FIX_LEDS_SLEEP
+fi
 cd /dev/gpio/LED
 for led in *; do
     echo $(cat $led) > $led
 done
+
+/usr/bin/logger -t ${1:-fix-leds} fix-leds done
+
 
 
