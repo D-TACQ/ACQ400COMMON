@@ -1,25 +1,43 @@
 #!/bin/sh
-
 # check if loaded FPGA is in release
 
+get_create_date() {
+	gunzip < $1 | xiloader 2>&1 | grep date.*: | awk '{ print $3 }' | tr -d /
+}
+
 PN=$(grep loaded /tmp/fpga_status | awk '{ print $3 }')
+
+#echo "PN:$PN created $(get_create_date $PN)"
 
 if [ "$(dirname $PN)" = "/mnt/fpga.d" ]; then
 	exit 0
 fi
+
 RN=/mnt/fpga.d/$(basename $PN)
-if [ -e $RN ]; then
-    cmp $PN $RN
+#echo RN:$RN
+(
+if [ "$RN" = "$PN" ]; then
+	echo NOTICE: stock fpga loaded
+elif [ -e $RN ]; then
+    cmp -s $PN $RN
     if [ $? -ne 0 ]; then
-        ( echo; echo ERROR FPGA image NOT in RELEASE;
+        LDATE=$(get_create_date $PN)
+        RDATE=$(get_create_date $RN)
+
+	if [ $LDATE -gt $RDATE ]; then
+		echo; echo WARNING: loaded FPGA not in release and newer than release
+	else
+    		echo; echo ERROR: loaded FPGA not in release and OLDER than RELEASE
+	fi
+	echo "load date: $LDATE"
+	echo "rel  date: $RDATE"
         sha1sum $PN $RN
-        ) >>/tmp/fpga_status
     fi
 else
-	( echo; 
-	  echo ERROR FPGA image NOT in RELEASE at all;
-	  echo $RN) >> /tmp/fpga_status
+	echo; 
+	echo ERROR: FPGA image NOT in RELEASE at all;
+	echo $RN
 fi
-
+) >> /tmp/fpga_status
 exit 0
 
