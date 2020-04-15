@@ -17,7 +17,7 @@ RN=/mnt/fpga.d/$(basename $PN)
 #echo RN:$RN
 (
 if [ "$RN" = "$PN" ]; then
-	echo NOTICE: stock fpga loaded
+	echo "NOTICE: fpga image loaded from release stock"
 elif [ -e $RN ]; then
     cmp -s $PN $RN
     if [ $? -ne 0 ]; then
@@ -25,9 +25,9 @@ elif [ -e $RN ]; then
         RDATE=$(get_create_date $RN)
 
 	if [ $LDATE -gt $RDATE ]; then
-		echo; echo WARNING: loaded FPGA not in release and newer than release
+		echo; echo "WARNING: loaded FPGA image is NEWER than RELEASE"
 	else
-    		echo; echo ERROR: loaded FPGA not in release and OLDER than RELEASE
+    		echo; echo "ERROR: loaded FPGA image is OLDER than RELEASE"
 	fi
 	echo "load date: $LDATE"
 	echo "rel  date: $RDATE"
@@ -35,7 +35,7 @@ elif [ -e $RN ]; then
     fi
 else
 	echo; 
-	echo ERROR: FPGA image NOT in RELEASE at all;
+	echo "ERROR: loaded FPGA image NOT in RELEASE at all"
 	echo $RN
 fi
 ) >> /tmp/fpga_status
