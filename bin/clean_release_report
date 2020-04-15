@@ -36,7 +36,7 @@ elif [ -e $RN ]; then
 else
 	echo; 
 	echo "ERROR: loaded FPGA image NOT in RELEASE at all"
-	echo $RN
+	ls $RN
 fi
 ) >> /tmp/fpga_status
 exit 0
