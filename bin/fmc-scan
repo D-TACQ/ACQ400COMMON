@@ -65,7 +65,7 @@ do
 					break
 				fi
 			done
-			echo 1 >/dev/gpio/LED/FMC${site}_R
+#			set.sys /dev/gpio/LED/FMC${site}_R 1
 		fi
 		let module_count=$module_count+1	
 	fi
@@ -335,7 +335,7 @@ fi
 
 for site in $good_sites
 do	
-	set.sys /dev/gpio/LED/FMC${site}_R 0
+#	set.sys /dev/gpio/LED/FMC${site}_R 0
 	set.sys /dev/gpio/LED/FMC${site}_G 1
 	let site_count=$site_count+1
 done
