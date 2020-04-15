@@ -339,7 +339,6 @@ do
 	set.sys /dev/gpio/LED/FMC${site}_G 1
 	let site_count=$site_count+1
 done
-(sleep 2; nice /usr/local/CARE/fix-leds called-from-fmc-scan) &
 
 echo $SITES > /etc/sites
 echo $GOOD_SITES >>/etc/sites
