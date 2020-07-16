@@ -201,7 +201,7 @@ hook_bus8_in() {
 
 	for dx in $(seq 0 7); do
 		echo $gp0 > /sys/class/gpio/export
-		ln -s /sys/class/gpio/gpio$gpio/value /dev/gpio/$nam/d$dx
+		ln -s /sys/class/gpio/gpio$gp0/value /dev/gpio/$nam/d$dx
 		gp0=$(($gp0+1))
 	done
 }
