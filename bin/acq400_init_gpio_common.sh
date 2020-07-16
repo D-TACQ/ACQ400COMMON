@@ -152,6 +152,7 @@ gpioLED() {
 	echo gpio$lgp
 }
 
+
 hook_hwmon() {
 # OK, this isn't gpio, but it's handy to put it here:
 	mkdir -p /dev/hwmon
@@ -187,8 +188,24 @@ hook_hwmon() {
 		*)
 			echo "WARNING: skipping unknown hwmon device $(cat $hwmon/name)";;
 		esac
-	done	
+	done
 }
+
+# gpiochip394 is the ZYNQ gpio. Let's hope it stays that way..
+hook_bus8_in() {
+	nam=$1;
+	gp0=$2;
+
+	gp0=$((394+$gp0))
+	mkdir /dev/gpio/$nam
+
+	for dx in $(seq 0 7); do
+		echo $gp0 > /sys/class/gpio/export
+		ln -s /sys/class/gpio/gpio$gpio/value /dev/gpio/$nam/d$dx
+		gp0=$(($gp0+1))
+	done
+}
+
 common_end() {
 	echo ++ acq400_init_gpio_common end 01		
 	clear_leds
@@ -198,5 +215,7 @@ common_end() {
 	clear_leds
 	echo "++ leds all clear now "
 	hook_hwmon		
+	hook_bus8_in TRG 54
+	hook_bus8_in EVT 62
 	echo ++ acq400_init_gpio_common end 99
 }
