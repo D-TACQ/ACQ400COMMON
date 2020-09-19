@@ -201,11 +201,19 @@ hook_bus8_in() {
 
 	for dx in $(seq 0 7); do
 		echo $gp0 > /sys/class/gpio/export
-		ln -s /sys/class/gpio/gpio$gp0/value /dev/gpio/$nam/d$dx
+		if [ $? -eq 0 ]; then
+			ln -s /sys/class/gpio/gpio$gp0/value /dev/gpio/$nam/d$dx
+		else
+			echo 0 > /dev/gpio/$nam/d$dx
+		fi
 		gp0=$(($gp0+1))
 	done
 }
 
+hook_pps() {
+	[ -e /proc/device-tree/pps ] && /sbin/insmod \
+		/lib/modules/$(uname -r)/pps-gpio.ko
+}
 common_end() {
 	echo ++ acq400_init_gpio_common end 01		
 	clear_leds
@@ -214,7 +222,8 @@ common_end() {
 	echo "++ lamp test 99"	
 	clear_leds
 	echo "++ leds all clear now "
-	hook_hwmon		
+	hook_hwmon
+	hook_pps	
 	hook_bus8_in TRG 54
 	hook_bus8_in EVT 62
 	echo ++ acq400_init_gpio_common end 99
