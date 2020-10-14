@@ -74,14 +74,15 @@ do
 	fi
 done
 
-SITES="sites="
-GOOD_SITES="good_sites="
+SITES=""
+GOOD_SITES=""
 
 aappend() {
-	case $1 in
-	*=) echo $1$2;;
-	*)  echo $1,$2;;
-	esac
+	if [ -z $2 ]; then
+		echo $1
+	else
+		echo $1,$2
+	fi
 }
 
 get_fpga_spec() {
@@ -324,13 +325,14 @@ loaded() {
 
 wildglob=$(echo $fglob | sed -e 's/ff/??/g')
 
-[ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
-[ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit.gz
-[ $(loaded) ] || select_fpga compatible_bit /mnt/${wildglob}*.bit.gz
-[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit.gz
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit.gz
-[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${wildglob}*.bit.gz
-
+if [ "x$SITES" = "x$GOOD_SITES" ]; then
+	[ $PREF_BIT ] && select_fpga compatible_bit $PREF_BIT
+	[ $(loaded) ] || select_fpga identical_bit  /mnt/${fglob}*.bit.gz
+	[ $(loaded) ] || select_fpga compatible_bit /mnt/${wildglob}*.bit.gz
+	[ $(loaded) ] || select_fpga identical_bit  /mnt/fpga.d/${fglob}*.bit.gz
+	[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${fglob}*.bit.gz
+	[ $(loaded) ] || select_fpga compatible_bit /mnt/fpga.d/${wildglob}*.bit.gz
+fi
 if [ "$fpga_image_good" = "" ]; then
 	echo ERROR: no valid FPGA image found, FPGA NOT LOADED
 	for site in $all_sites
@@ -347,8 +349,8 @@ do
 	let site_count=$site_count+1
 done
 
-echo $SITES > /etc/sites
-echo $GOOD_SITES >>/etc/sites
+echo "sites=$SITES" > /etc/sites
+echo "good_sites=$GOOD_SITES" >>/etc/sites
 
 source /etc/sites
 
@@ -379,6 +381,7 @@ echo "$SL2" >/etc/acq400/0/SL2
 if [ "x$sites" = "x$good_sites" ]; then
 	echo ++ Sites populated: $site_count ALL GOOD
 else
+    [ "x$good_sites" = "x" ] && good_sites=NONE
 	echo ++ Sites populated: $site_count WARNING: FOUND:$sites GOOD:$good_sites
 fi
 
