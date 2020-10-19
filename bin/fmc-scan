@@ -369,7 +369,6 @@ get_model_code() {
 
 SITELIST=$(get_model_code 0 | tr -d 0)
 
-eval $SITES
 for site in $(echo $sites | tr ,C \  )
 do
 	SITELIST="${SITELIST},${site}=$(get_model_code $site)"	
