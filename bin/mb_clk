@@ -54,7 +54,6 @@ while { 1 } {
 		}
 	}
 }
-}
 
 puts "DONE expecting .. "
 
