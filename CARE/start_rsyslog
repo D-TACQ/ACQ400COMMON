@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "x$1" != "x" ]; then
+	echo +++ starting rsyslog $1
+	killall syslogd
+	syslogd -R $1:514
+	klogd -c 1
+	logger -t acq400common rsyslog started ..
+fi
