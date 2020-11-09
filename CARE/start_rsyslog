@@ -17,6 +17,19 @@ if [ "x$1" != "x" ]; then
 		sleep 1
 	done
 
+	ping_fail=1
+	retry=0
+	while [ $ping_fail -ne 0 ]; do
+	    retry=$(($retry+1))
+	    if [ $retry -gt 10 ]; then
+	    	echo +++ ERROR rsyslog ping $1 fail retry $retry quit
+	    	exit 1
+	    fi
+		timeout 2 ping -c 1 $1
+		ping_fail=$?
+		[ $ping_fail -eq 0 ] || sleep 2
+	done
+	
 	killall syslogd
 	syslogd -R $1:514
 	klogd -c 1
