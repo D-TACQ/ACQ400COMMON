@@ -9,7 +9,7 @@ if [ "x$1" != "x" ]; then
 	while [ $link_ready -eq 0 ]; do
 		for k in /sys/class/net/eth?/operstate; do
 			state=$(cat $k)
-			if [ "$state" -eq "up" ] then
+			if [ "$state" = "up" ]; then
 				link_ready=1
 				break
 			fi
