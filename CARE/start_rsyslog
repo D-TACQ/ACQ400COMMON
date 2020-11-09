@@ -1,9 +1,25 @@
 #!/bin/sh
 
+link_ready=0
+
 if [ "x$1" != "x" ]; then
 	echo +++ starting rsyslog $1
+
+	(	
+	while [ $link_ready -eq 0 ]; do
+		for k in /sys/class/net/eth?/operstate; do
+			state=$(cat $k)
+			if [ "$state" -eq "up" ] then
+				link_ready=1
+				break
+			fi
+		done
+		sleep 1
+	done
+
 	killall syslogd
 	syslogd -R $1:514
 	klogd -c 1
 	logger -t acq400common rsyslog started ..
+	) &
 fi
