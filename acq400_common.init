@@ -28,8 +28,6 @@ echo ${hn#*=}  	>/etc/acq400/0/HN
 
 /sbin/insmod /lib/modules/$(uname -r)/xilinx_devcfg.ko
 
-ln -s /usr/local/bin/soft_trigger /etc/acq400/0/soft_trigger
-
 [ -e /mnt/local/sysconfig/localtime ] && cp /mnt/local/sysconfig/localtime /etc
 # possible to make wholesale changes to /etc, but insist on tarball to get
 # permisssions right.
