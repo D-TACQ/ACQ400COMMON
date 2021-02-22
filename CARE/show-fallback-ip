@@ -3,6 +3,7 @@
 
 GOODSHA="133db8eeb4c5d6d3a38bbce89187eae4a5f89128  /etc/network/default-networkrc"
 GOODSHA="e41bc7c6bfeee7d252233a1b89eaa348582c79df  /etc/network/default-networkrc"
+GOODSHA="288561739c8d56c804509cf1e5a514a07806ab84  /etc/network/default-networkrc"
 
 SHA1="$(sha1sum /etc/network/default-networkrc)"
 
