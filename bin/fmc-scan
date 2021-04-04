@@ -368,6 +368,9 @@ get_model_code() {
 
 
 SITELIST=$(get_model_code 0 | tr -d 0)
+if [ "$SITELIST" = "21637" ]; then
+	SITELIST=237
+fi
 
 for site in $(echo $sites | tr ,C \  )
 do
