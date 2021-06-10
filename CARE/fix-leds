@@ -12,17 +12,8 @@ cd /dev/gpio/LED
 for led in *; do
     state=$(cat $led)
     if [ "$state" = "-22" ]; then
-	    case $led in
-            *R)
-	    	    log $led $state fix 0
-		    state=0;;
-            *G)
-		    log $led $state fix 1
-		    state=0;;
-            *)
-		    log $led $state fix 0
-		    state=0
-            esac
+        log $led $state fix 0
+	state=0
     fi
     echo $state > $led
 done
