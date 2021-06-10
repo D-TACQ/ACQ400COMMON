@@ -1,0 +1,29 @@
+#!/bin/sh
+
+log() {
+/usr/bin/logger -t fix-leds-watcher $*
+}
+
+SLEEP=${1:-$FIX_LEDS_SLEEP}
+
+if [ "x$SLEEP" = "x" ]; then
+	SLEEP=10
+fi
+
+cd /dev/gpio/LED
+
+while [ 1 ]; do
+	sleep $SLEEP
+	for led in *; do
+	    state=$(cat $led)
+            if [ "$state" = "-22" ]; then
+                log $led $state fix 0
+	        state=0
+    	        echo $state > $led
+            fi
+        done
+done
+
+
+
+
