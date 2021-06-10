@@ -1,14 +1,33 @@
 #!/bin/sh
 
+log() {
+/usr/bin/logger -t fix-leds $*
+}
+
 if [ "x$FIX_LEDS_SLEEP" != "x" ]; then
 	sleep $FIX_LEDS_SLEEP
 fi
+log 01
 cd /dev/gpio/LED
 for led in *; do
-    echo $(cat $led) > $led
+    state=$(cat $led)
+    if [ "$state" = "-22" ]; then
+	    case $led in
+            *R)
+	    	    log $led $state fix 0
+		    state=0;;
+            *G)
+		    log $led $state fix 1
+		    state=0;;
+            *)
+		    log $led $state fix 0
+		    state=0
+            esac
+    fi
+    echo $state > $led
 done
 
-/usr/bin/logger -t ${1:-fix-leds} fix-leds done
+log 99
 
 
 
