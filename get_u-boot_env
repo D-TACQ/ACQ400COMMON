@@ -2,10 +2,13 @@
 
 if [ -e /dev/mtd0 ]; then
 	dd if=/dev/mtd0 bs=1024 skip=896 | dump-cstrings | 
-		grep -v \&\& | sed -e 's/=/="/' -e 's/$/"/' >/tmp/u-boot_env
-else
-	echo "# dummy env" > /tmp/u-boot_env
+	grep -v \&\& | sed -e 's/=/="/' -e 's/$/"/' >/tmp/u-boot_env
+	nl=$(cat /tmp/u-boot_env | wc -l)
+	if [ $nl -gt 1 ]; then
+		exit 0
+	fi
 fi
+echo "# dummy env" > /tmp/u-boot_env
 
 
 
