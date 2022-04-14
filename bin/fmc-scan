@@ -292,7 +292,7 @@ load_fpga() {
 
 select_fpga() {
 		filter=$1;shift
-		for fn in $(ls $* | sed -e 's/.bit.gz//' | sort)
+		for fn in $(ls $* 2>/dev/null | sed -e 's/.bit.gz//' | sort)
 		do
 			file=${fn}.bit.gz
 			if [ -e $file ]; then
