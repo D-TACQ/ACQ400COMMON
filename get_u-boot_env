@@ -1,6 +1,8 @@
 #!/bin/sh
 
-if [ -e /dev/mtd0 ]; then
+if [ -e /tmp/u-boot_env ]; then
+    exit 0
+elif [ -e /dev/mtd0 ]; then
 	dd if=/dev/mtd0 bs=1024 skip=896 | dump-cstrings | 
 	grep -v \&\& | sed -e 's/=/="/' -e 's/$/"/' >/tmp/u-boot_env
 	nl=$(cat /tmp/u-boot_env | wc -l)
@@ -9,6 +11,7 @@ if [ -e /dev/mtd0 ]; then
 	fi
 fi
 echo "# dummy env" > /tmp/u-boot_env
+
 
 
 
