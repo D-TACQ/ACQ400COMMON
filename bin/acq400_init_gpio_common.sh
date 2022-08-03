@@ -195,8 +195,8 @@ hook_hwmon() {
 hook_bus8_in() {
 	nam=$1;
 	gp0=$2;
-
-	gp0=$((394+$gp0))
+	zgpio0=$(get_zynq_gpio0)
+	gp0=$(($zgpio0+$gp0))
 	mkdir /dev/gpio/$nam
 
 	for dx in $(seq 0 7); do
