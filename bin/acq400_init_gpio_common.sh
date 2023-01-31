@@ -61,6 +61,9 @@ lnAH() {
 	ln -s $1/value $2	
 }
 
+lnAHO() {
+	setO $1; ln -s $1/value $2	
+}
 
 mkln() {
 	gpn=$1
