@@ -273,7 +273,7 @@ identical_bit() {
 FPGA_STATUS=/tmp/fpga_status
 
 fpga_check() {
-        grep filename $FPGA_STATUS | awk '{ print $5 }'
+	basename $(grep loaded /tmp/fpga_status | awk '{ print $3 }') .bit.gz
         grep date $FPGA_STATUS |  awk '{print $3}'
 }
 
