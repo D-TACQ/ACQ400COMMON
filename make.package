@@ -7,7 +7,7 @@ PKGID=acq400_common
 TOP=.
 
 rm -Rf opkg/*
-mkdir -p opkg/usr/local/bin opkg/usr/local/init opkg/etc/ opkg/bin \
+mkdir -p release opkg/usr/local/bin opkg/usr/local/init opkg/etc/ opkg/bin \
 	opkg/usr/local/CARE
 
 cp ${TOP}/get_u-boot_env opkg/usr/local/bin
