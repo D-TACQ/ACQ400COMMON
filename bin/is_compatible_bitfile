@@ -35,6 +35,14 @@ foreach myfield $myspec {
 	
 	if {$myfield == "ff"} {
 		;
+	} elseif {[string compare $myfield "ACQ2\[12\]06"] == 0} {
+		puts "special case ACQ2x06"
+		if {[string compare -length $sl 'ACQ2206', $ffield] == 0 ||
+	            [string compare -length $sl 'ACQ2106', $ffield]         } {
+			;
+		} else {
+                    exit 1
+		}
 	} elseif {[string compare -length $sl $myfield $ffield] == 0} {
 		;
 	} elseif {$myfield == "62"} {
