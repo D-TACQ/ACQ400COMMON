@@ -1,0 +1,28 @@
+
+CFG=/sys/kernel/config
+
+mount | grep -q $CFG || mount -t configfs none $CFG
+
+load_overlay() {
+    if [ "x$2" != "x" ]; then
+    	if [ ! -e "$2" ]; then
+    		echo "ERROR file $2 not found"
+    		exit 1
+    	else
+    		fn=$2
+    	fi
+	elif [ -e $1.dtb ]; then
+	 	fn=$1.dtb
+	elif [ -e /mnt/dtb.d/$1.dtb ]; then
+		fn=/mnt/dtb.d/$1.dtb
+	elif [ -e /mnt/dtb.d/${1}_overlay.dtb ]; then
+		fn=/mnt/dtb.d/${1}_overlay.dtb
+	else
+		echo "ERROR neither $1.dtb nor /mnt/dtb.d/$1.dtb nor /mnt/dtb.d/${1}_overlay.dtb found"
+		exit 1
+	fi
+	echo "loading overlay $fn $1 ..."
+	dto=$CFG/device-tree/overlays/$1
+	mkdir -p $dto
+	cat $fn > $dto/dtbo
+}
