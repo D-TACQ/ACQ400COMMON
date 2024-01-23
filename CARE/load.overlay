@@ -26,3 +26,7 @@ load_overlay() {
 	mkdir -p $dto
 	cat $fn > $dto/dtbo
 }
+
+if [ "$(basename $0)" = "load.overlay" ]; then
+	load_overlay $*
+fi
