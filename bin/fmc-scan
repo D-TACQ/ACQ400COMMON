@@ -56,6 +56,9 @@ let module_count=0
 
 all_sites=""
 
+BUS_SITE_OFFSET=1
+[ "$FMC_SCAN_FPGA" -eq "Z7IO" ] && BUS_SITE_OFFSET=2
+
 for PRD in /dev/gpio/*present
 do
 	_PRDx=${PRD#/dev/gpio/fmc}
@@ -71,7 +74,7 @@ do
 		# PMODS are faked .. don't try make them again0
 		if [ ! -e /dev/sites/$site ]; then  
 			mkdir /dev/sites/$site
-			let BUS=$site+1
+			BUS=$((site+BUS_SITE_OFFSET))
 			# mtca shim puts the eeprom at non-standard address
 			for ba in 0050 0051 0052
 			do
