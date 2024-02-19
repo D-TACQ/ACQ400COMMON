@@ -61,6 +61,8 @@ acq4xx-transient-log-console	2235/tcp
 EOF
 sort_services
 
+/usr/local/CARE/custom_at.init
+
 
 # may need to do this again later if more services are defined
 make-console-links

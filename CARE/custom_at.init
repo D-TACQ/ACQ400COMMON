@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir -p /var/spool/cron/atjobs/ /var/spool/cron/atspool/
+touch /var/spool/cron/atjobs/.SEQ
+chown -R daemon /var/spool/cron/
+
+atd
+cd /usr/local/bin
+ln -s at atq
+ln -s at atrm
+ln -s at batch
+
