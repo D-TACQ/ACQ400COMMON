@@ -1,0 +1,24 @@
+#!/bin/sh
+# load FPGA stock image
+FPM=/mnt/fpga.d
+if mount | grep -q $FPM; then
+	echo $FPM is already mounted
+else
+	mounted_up=0
+	for img in /mnt/ko/*fpga*.img; do
+		if [ -e $img ]; then
+			if [ $mounted_up -eq 0 ]; then
+				mount $img $FPM
+				if [ $? -eq 0 ]; then
+					echo +++ mounted fpga stock $img at $FPM
+					mounted_up=1
+				else
+					echo +++ ERROR: failed to mount fpga stock
+				fi
+			else
+				echo +++ WARNING: multiple fpga stock images found
+			fi
+		fi
+	done
+fi
+
