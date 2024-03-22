@@ -43,6 +43,8 @@ patch_check() {
 ) > /etc/acq400/0/software_version
 }
 
+echo 1 > /etc/sysconfig/i2c_site2bus
+
 daemon /usr/local/CARE/slug_spurious_uart_interrupts daemon 10
 patch_check &
 
