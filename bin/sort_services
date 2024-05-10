@@ -2,6 +2,8 @@
 
 FN=${1:-/etc/services}
 
+exit 0
+
 mv $FN $FN.bak
 tr -s '\t' @ < $FN.bak |  sort -n -t @ -k2 | tr @ ' ' | \
  awk '/^#/ { print; next } 
