@@ -1,0 +1,39 @@
+#!/bin/sh
+#promote fpga
+
+target=$1
+rootdir="/mnt"
+
+if [ ! -e "$target" ]; then
+    echo "fpga not found"
+    echo "USAGE promote fpga"
+    exit 1
+fi
+
+#demote existing fpgas
+for filepath in "$rootdir"/*.bit.gz; do
+    filename=$(basename "$filepath")
+    if [ "$filename" == "$target" ]; then
+        continue
+    fi
+    if [ "${filename#"__"}" != "$filename" ]; then
+        continue
+    fi
+    mv "$filepath" "$rootdir/__$filename"
+done
+
+filename=$(basename "$target")
+sourcedir=$(dirname "$target")
+destination="$rootdir/$filename"
+
+#remove prefix if exists
+if [ "${filename#"__"}" != "$filename" ]; then
+    destination="$rootdir/${filename#"__"}"
+fi
+
+if [ -e "$rootdir/$filename" ]; then
+    mv $target $destination
+else
+    cp $target $destination
+fi
+echo "Promoted $destination"
