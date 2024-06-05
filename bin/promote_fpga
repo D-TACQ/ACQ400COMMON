@@ -1,0 +1,53 @@
+#!/bin/sh
+# promote_fpga PERSONALITY
+# .. demote any existing promotion and do this one instead.
+# promote_fpga <.
+# .. demote any existing promotion and return to default
+# demoted personalities are stored in /mnt/demoted
+# demoting personalities with __ is deprecated, __ is removed on demotion.
+
+
+STOCK=/mnt/fpga.d
+PROMD=/mnt
+DEMOD=/mnt/demoted
+
+die() {
+	echo ERROR: $1
+	exit 1
+}
+
+mkdir -p $DEMOD
+
+for fp in $PROMD/*TOP*.bit.gz; do
+	[ ! -e $fp ] && break
+	file=$(basename $fp)
+	if [ -e $STOCK/$file ] && cmp -s $fp $STOCK/$file; then
+		echo personality $fp is in STOCK, deleting
+		rm $fp
+	else
+		if [ "$file" != "${file#*__}" ]; then
+			echo storing DEPRECATED __personality $fp as $DEMOD/${file#*__}
+			mv $fp $DEMOD/${file#*__}
+		else
+			echo storing personality $fp in $DEMOD
+			mv $fp $DEMOD
+		fi
+	fi
+done
+
+[ -z $1 ] && exit 0
+
+[ ! -f $1 ] && die " FILE $1 does not exist"
+
+[ "$1" = "${1%*bit.gz}" ] && die "FILE $1 does not end .bit.gz"
+[ "$1" = "${1%_TOP_*}" ]  && die "FILE $1 does look like an fpga personality"
+
+
+echo PROMOTING $1
+cp $1 $PROMD/
+exit 0
+
+
+	
+
+
