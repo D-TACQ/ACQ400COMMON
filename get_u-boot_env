@@ -1,5 +1,14 @@
 #!/bin/sh
 
+DTROOT=/proc/device-tree/chosen
+
+for dt_model in ${DTROOT}/model ${DTROOT}/compatible_model; do
+        if [ -e $dt_model ] && [ "$(cat $dt_model)" = "z7io" ]; then
+                echo "# z7io fix env later" > /tmp/u-boot_env
+                exit 0
+        fi
+done
+
 if [ -e /tmp/u-boot_env ]; then
     exit 0
 elif [ -e /dev/mtd0 ]; then
