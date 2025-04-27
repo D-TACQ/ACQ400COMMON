@@ -60,6 +60,7 @@ acq4xx-aimonitor-console	2223/tcp
 acq4xx-mdsshell-console		2224/tcp
 acq4xx-transient-console	2225/tcp
 acq4xx-nowhere-console		2226/tcp
+acq4xx-epics-aux-console	2228/tcp
 acq4xx-transient-log-console	2235/tcp
 EOF
 sort_services
