@@ -139,26 +139,31 @@ decode_fru() {
 	echo "$FRU_MAN" > $sdir/MANUFACTURER	
 	echo $FRU_PART_NUM > $sdir/PART_NUM	
 
-	_IFS=$IFS
-	IFS='-'
-	let ii=0
-	for field in $FRU_PART_NUM
-	do
+	model=$(echo $FRU_PART_NUM | awk '{ print $1 }')
+	if echo $model | grep -q -- -; then
+		_IFS=$IFS			# hyphenated name. more trouble..
+		IFS='-'
+		let ii=0
+		for field in $FRU_PART_NUM
+		do
 #		echo decode FRU_PART_NUM: $FRU_PART_NUM: ii $ii field $field
-		case $ii in
-		0) [ -e $sdir/MODEL ] || echo $field > $sdir/MODEL;;
-		1) nchan=$(echo $field | sed -e 's/[^0-9]//g')		
-		   [ -e $sdir/NCHAN ] || echo $nchan  > $sdir/NCHAN;;
-		2) echo $field > $sdir/MAXRATE;;
-		3) echo $field > $sdir/RESOLUTION;;
-		esac
-		let ii=$ii+1
-		if [ $ii -eq 2 -a "$M" != "01" ]; then
-			# next fields valid ACQ420 only
-			break;
-		fi
-	done
-	IFS=$_IFS			
+			case $ii in
+			0) [ -e $sdir/MODEL ] || echo $field > $sdir/MODEL;;
+			1) nchan=$(echo $field | sed -e 's/[^0-9]//g')
+			[ -e $sdir/NCHAN ] || echo $nchan  > $sdir/NCHAN;;
+			2) echo $field > $sdir/MAXRATE;;
+			3) echo $field > $sdir/RESOLUTION;;
+			esac
+			let ii=$ii+1
+			if [ $ii -eq 2 -a "$M" != "01" ]; then
+				# next fields valid ACQ420 only
+				break;
+			fi
+		done
+		IFS=$_IFS
+	else
+		echo $model > $sdir/MODEL    # no hyphens
+	fi
 
 	grep -q FRU_PROD_NAME $details
 	if [ $? -eq 0 ]; then
