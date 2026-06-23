@@ -155,11 +155,16 @@ decode_fru() {
 			3) echo $field > $sdir/RESOLUTION;;
 			esac
 			let ii=$ii+1
-			# commented out below to allow MAXRATE and RESOLUTION for all
-                        #if [ $ii -eq 2 -a "$M" != "01" ]; then
-				# next fields valid ACQ420 only
-			#	break;
-			#fi
+                        if [ $ii -eq 2 ]; then
+                            case "$M" in
+                                "01"|"0D")
+                                    # next fields valid for ACQ420 or ACQ428 only
+                                    ;;
+                                *)
+				    # break on all other module IDs
+				    break;;
+                            esac
+			fi
 		done
 		IFS=$_IFS
 	else
